@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Copy, Wand2 } from "lucide-react";
 
 const PromptImprover = () => {
   const [prompt, setPrompt] = useState("");
   const [improvedPrompt, setImprovedPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("gpt-4");
   const { toast } = useToast();
 
   const improvePrompt = async () => {
@@ -27,9 +29,17 @@ const PromptImprover = () => {
       
       let improved = prompt.trim();
       
+      // Add model-specific improvements (for demo purposes)
+      const modelPrefix = selectedModel.includes('claude') ? 'Using advanced reasoning, create' :
+                         selectedModel.includes('gpt-4') ? 'With high-level analysis, develop' :
+                         selectedModel.includes('gemini') ? 'Through comprehensive understanding, build' :
+                         'Create';
+      
       // Add more specific details
-      if (!improved.includes("detailed")) {
-        improved = "Create a detailed " + improved;
+      if (!improved.toLowerCase().includes("detailed")) {
+        improved = `${modelPrefix} a detailed ` + improved.charAt(0).toLowerCase() + improved.slice(1);
+      } else {
+        improved = `${modelPrefix} ` + improved.charAt(0).toLowerCase() + improved.slice(1);
       }
       
       // Add quality expectations
@@ -55,7 +65,7 @@ const PromptImprover = () => {
       setImprovedPrompt(improved);
       toast({
         title: "Prompt improved!",
-        description: "Your prompt has been enhanced with more specific details and clarity.",
+        description: `Enhanced using ${selectedModel.toUpperCase()} with more specific details and clarity.`,
       });
     } catch (error) {
       toast({
@@ -96,6 +106,24 @@ const PromptImprover = () => {
       </div>
 
       <div className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">AI Model</label>
+          <Select value={selectedModel} onValueChange={setSelectedModel}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select an AI model" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gpt-4">GPT-4 (OpenAI)</SelectItem>
+              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (OpenAI)</SelectItem>
+              <SelectItem value="claude-3-opus">Claude 3 Opus (Anthropic)</SelectItem>
+              <SelectItem value="claude-3-sonnet">Claude 3 Sonnet (Anthropic)</SelectItem>
+              <SelectItem value="claude-3-haiku">Claude 3 Haiku (Anthropic)</SelectItem>
+              <SelectItem value="gemini-pro">Gemini Pro (Google)</SelectItem>
+              <SelectItem value="llama-2">Llama 2 (Meta)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="space-y-2">
           <label className="text-sm font-medium">Your Prompt</label>
           <Textarea
