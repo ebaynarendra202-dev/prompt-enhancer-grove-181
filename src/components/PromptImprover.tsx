@@ -39,6 +39,8 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       // For this demo, we'll simulate an AI improvement with some common enhancement patterns
       await new Promise((resolve) => setTimeout(resolve, 1500));
       
+      const originalPrompt = prompt.trim();
+      
       let improved = prompt.trim();
       
       // Add model-specific improvements (for demo purposes)
@@ -75,6 +77,11 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       }
       
       setImprovedPrompt(improved);
+      
+      // Track the improvement in analytics
+      const { trackPromptImprovement } = await import("@/hooks/useAnalytics");
+      await trackPromptImprovement(originalPrompt, improved, selectedModel);
+      
       toast({
         title: "Prompt improved!",
         description: `Enhanced using ${selectedModel.toUpperCase()} with more specific details and clarity.`,
