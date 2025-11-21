@@ -8,7 +8,7 @@ import { promptTemplates, TEMPLATE_CATEGORIES, TemplateCategory, PromptTemplate 
 import { Code, Image, FileText, Search, Briefcase, Sparkles } from "lucide-react";
 
 interface TemplateLibraryProps {
-  onSelectTemplate: (prompt: string) => void;
+  onSelectTemplate: (prompt: string, templateId: string, category: string) => void;
 }
 
 const categoryIcons: Record<TemplateCategory, React.ComponentType<any>> = {
@@ -87,7 +87,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     <TemplateCard
                       key={template.id}
                       template={template}
-                      onSelect={() => onSelectTemplate(template.prompt)}
+                      onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
                     />
                   ))}
                 </div>
@@ -110,7 +110,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     <TemplateCard
                       key={template.id}
                       template={template}
-                      onSelect={() => onSelectTemplate(template.prompt)}
+                      onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
                     />
                   ))}
                 </div>

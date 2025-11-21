@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      prompt_improvements: {
+        Row: {
+          ai_model: string
+          created_at: string
+          id: string
+          improved_prompt: string
+          original_prompt: string
+        }
+        Insert: {
+          ai_model: string
+          created_at?: string
+          id?: string
+          improved_prompt: string
+          original_prompt: string
+        }
+        Update: {
+          ai_model?: string
+          created_at?: string
+          id?: string
+          improved_prompt?: string
+          original_prompt?: string
+        }
+        Relationships: []
+      }
+      template_usage: {
+        Row: {
+          created_at: string
+          id: string
+          template_category: string
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          template_category: string
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          template_category?: string
+          template_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
