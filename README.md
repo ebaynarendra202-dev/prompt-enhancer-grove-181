@@ -1,69 +1,146 @@
-# Welcome to your Lovable project
+# AI Prompt Improver
 
-## Project info
+A modern web application that helps you enhance your AI prompts with intelligent suggestions and improvements tailored to different AI models.
 
-**URL**: https://lovable.dev/projects/d56d67db-1c50-48f2-960c-1aa41fc88736
+## 🌟 Features
 
-## How can I edit this code?
+### Core Functionality
+- **Prompt Enhancement**: Automatically improve your prompts with AI-driven suggestions
+- **Multi-Model Support**: Choose from 7 different AI models for optimized prompt improvements:
+  - GPT-4 (OpenAI)
+  - GPT-3.5 Turbo (OpenAI)
+  - Claude 3 Opus (Anthropic)
+  - Claude 3 Sonnet (Anthropic)
+  - Claude 3 Haiku (Anthropic)
+  - Gemini Pro (Google)
+  - Llama 2 (Meta)
 
-There are several ways of editing your application.
+### User Experience
+- **Copy to Clipboard**: One-click copy of improved prompts
+- **Real-time Feedback**: Toast notifications for all user actions
+- **Loading States**: Visual feedback during prompt processing
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Dark/Light Mode**: Adaptive theme support
 
-**Use Lovable**
+### Prompt Improvements
+The application enhances your prompts by automatically adding:
+- Specific details and context
+- Quality expectations
+- Style guidance
+- Format specifications
+- Example requests where appropriate
+- Model-specific optimizations
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d56d67db-1c50-48f2-960c-1aa41fc88736) and start prompting.
+## 🛠️ Technology Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend Framework**: React 18
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Routing**: React Router DOM
+- **State Management**: React Hooks
+- **Icons**: Lucide React
+- **Animations**: Tailwind CSS Animate
 
-**Use your preferred IDE**
+## 🚀 Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+1. Clone the repository:
+```bash
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. Install dependencies:
+```bash
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+4. Open your browser and navigate to `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📖 How to Use
 
-**Use GitHub Codespaces**
+1. **Select an AI Model**: Choose your preferred AI model from the dropdown menu
+2. **Enter Your Prompt**: Type or paste your original prompt in the input field
+3. **Click "Improve Prompt"**: Let the application enhance your prompt
+4. **Copy the Result**: Use the copy button to save your improved prompt to clipboard
+5. **Use in Your AI Tool**: Paste the enhanced prompt into your favorite AI application
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎨 UI Components
 
-## What technologies are used for this project?
+The application uses a comprehensive set of shadcn/ui components:
+- Buttons with multiple variants
+- Text areas for input
+- Select dropdowns
+- Toast notifications
+- Cards and badges
+- Loading spinners
+- Responsive layouts
 
-This project is built with .
+## 📦 Available Scripts
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-## How can I deploy this project?
+## 🎯 Use Cases
 
-Simply open [Lovable](https://lovable.dev/projects/d56d67db-1c50-48f2-960c-1aa41fc88736) and click on Share -> Publish.
+- **Content Creation**: Improve prompts for blog posts, articles, and social media
+- **Code Generation**: Enhance prompts for better code suggestions
+- **Image Generation**: Optimize prompts for AI art tools
+- **Research**: Create more effective prompts for information gathering
+- **Education**: Learn how to write better AI prompts
 
-## I want to use a custom domain - is that possible?
+## 🌐 Deployment
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+This application can be easily deployed to:
+- Netlify
+- Vercel
+- GitHub Pages
+- Lovable (recommended)
+
+### Deploy with Lovable
+
+Simply visit [Lovable](https://lovable.dev/projects/d56d67db-1c50-48f2-960c-1aa41fc88736) and click on Share → Publish.
+
+## 🔧 Customization
+
+The application uses a design system with semantic tokens defined in:
+- `src/index.css` - CSS variables and theme configuration
+- `tailwind.config.ts` - Tailwind CSS customization
+
+## 📝 License
+
+This project is built with Lovable and is available for personal and commercial use.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+## 📞 Support
+
+For support and questions:
+- Visit [Lovable Documentation](https://docs.lovable.dev/)
+- Join [Lovable Discord Community](https://discord.com/channels/1119885301872070706/1280461670979993613)
+
+## 🔗 Links
+
+- **Project URL**: https://lovable.dev/projects/d56d67db-1c50-48f2-960c-1aa41fc88736
+- **Documentation**: https://docs.lovable.dev/
+- **Custom Domain Setup**: https://docs.lovable.dev/tips-tricks/custom-domain/
+
+---
+
+Built with ❤️ using [Lovable](https://lovable.dev)
