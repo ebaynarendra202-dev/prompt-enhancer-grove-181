@@ -1,16 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Copy, Wand2 } from "lucide-react";
 
-const PromptImprover = () => {
-  const [prompt, setPrompt] = useState("");
+interface PromptImproverProps {
+  initialPrompt?: string;
+}
+
+const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
+  const [prompt, setPrompt] = useState(initialPrompt);
   const [improvedPrompt, setImprovedPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("gpt-4");
   const { toast } = useToast();
+
+  // Update prompt when initialPrompt changes
+  useEffect(() => {
+    if (initialPrompt) {
+      setPrompt(initialPrompt);
+      setImprovedPrompt(""); // Clear previous improved prompt
+    }
+  }, [initialPrompt]);
 
   const improvePrompt = async () => {
     if (!prompt.trim()) {
