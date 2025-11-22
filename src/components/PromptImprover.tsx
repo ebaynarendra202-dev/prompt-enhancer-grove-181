@@ -36,55 +36,40 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
 
     setIsLoading(true);
     try {
-      // For this demo, we'll simulate an AI improvement with some common enhancement patterns
+      // Simulate AI improvement
       await new Promise((resolve) => setTimeout(resolve, 1500));
       
       const originalPrompt = prompt.trim();
       
-      let improved = prompt.trim();
+      // Build structured improvement with bullet points
+      const modelPrefix = selectedModel.includes('claude') ? 'Using advanced reasoning' :
+                         selectedModel.includes('gpt-4') ? 'With high-level analysis' :
+                         selectedModel.includes('gemini') ? 'Through comprehensive understanding' :
+                         'Using AI assistance';
       
-      // Add model-specific improvements (for demo purposes)
-      const modelPrefix = selectedModel.includes('claude') ? 'Using advanced reasoning, create' :
-                         selectedModel.includes('gpt-4') ? 'With high-level analysis, develop' :
-                         selectedModel.includes('gemini') ? 'Through comprehensive understanding, build' :
-                         'Create';
+      const baseTask = originalPrompt.charAt(0).toLowerCase() + originalPrompt.slice(1);
       
-      // Add more specific details
-      if (!improved.toLowerCase().includes("detailed")) {
-        improved = `${modelPrefix} a detailed ` + improved.charAt(0).toLowerCase() + improved.slice(1);
-      } else {
-        improved = `${modelPrefix} ` + improved.charAt(0).toLowerCase() + improved.slice(1);
-      }
+      // Create a structured prompt with main instruction and bullet points
+      const structuredPrompt = [
+        `${modelPrefix}, ${baseTask.replace(/\.$/, '')}, ensuring:`,
+        '',
+        '• High quality output with professional standards',
+        '• Clear, well-structured format for easy understanding',
+        '• Professional and engaging writing style',
+        '• Relevant examples and context where appropriate',
+        '• Attention to detail and accuracy',
+        '• Actionable and practical information'
+      ].join('\n');
       
-      // Add quality expectations
-      if (!improved.toLowerCase().includes("high quality")) {
-        improved += ", ensuring high quality output";
-      }
-      
-      // Add style guidance if not present
-      if (!improved.includes("style")) {
-        improved += ", maintaining a professional and engaging style";
-      }
-      
-      // Add clarity about format if not specified
-      if (!improved.includes("format")) {
-        improved += ". Present the information in a clear, well-structured format";
-      }
-      
-      // Add request for examples if appropriate
-      if (!improved.includes("example")) {
-        improved += ", including relevant examples where appropriate";
-      }
-      
-      setImprovedPrompt(improved);
+      setImprovedPrompt(structuredPrompt);
       
       // Track the improvement in analytics
       const { trackPromptImprovement } = await import("@/hooks/useAnalytics");
-      await trackPromptImprovement(originalPrompt, improved, selectedModel);
+      await trackPromptImprovement(originalPrompt, structuredPrompt, selectedModel);
       
       toast({
         title: "Prompt improved!",
-        description: `Enhanced using ${selectedModel.toUpperCase()} with more specific details and clarity.`,
+        description: `Enhanced with structured bullet points using ${selectedModel.toUpperCase()}.`,
       });
     } catch (error) {
       toast({
@@ -185,13 +170,10 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                 Copy
               </Button>
             </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-brand-100/50 to-brand-200/50 rounded-lg" />
-              <Textarea
-                value={improvedPrompt}
-                readOnly
-                className="min-h-[100px] resize-none bg-transparent relative z-10"
-              />
+            <div className="relative rounded-lg border border-brand-200 bg-gradient-to-r from-brand-50/50 to-brand-100/50 p-4">
+              <div className="text-sm text-foreground whitespace-pre-wrap font-medium leading-relaxed">
+                {improvedPrompt}
+              </div>
             </div>
           </div>
         )}
