@@ -6,12 +6,15 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wand2, BarChart3 } from "lucide-react";
-import { trackTemplateUsage } from "@/hooks/useAnalytics";
+import { trackTemplateUsage, useAnalytics } from "@/hooks/useAnalytics";
+import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 
 const Index = () => {
   const [selectedPrompt, setSelectedPrompt] = useState("");
   const [activeTab, setActiveTab] = useState("improver");
   const improverRef = useRef<HTMLDivElement>(null);
+  const { data: analytics } = useAnalytics();
+  useMilestoneNotifications(analytics);
 
   const handleSelectTemplate = async (prompt: string, templateId: string, category: string) => {
     setSelectedPrompt(prompt);
