@@ -3,17 +3,37 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Loader2, Copy, Wand2 } from "lucide-react";
 
 interface PromptImproverProps {
   initialPrompt?: string;
 }
 
+interface Enhancement {
+  id: string;
+  label: string;
+  text: string;
+}
+
+const availableEnhancements: Enhancement[] = [
+  { id: "quality", label: "High Quality Output", text: "• High quality output with professional standards" },
+  { id: "format", label: "Clear Structure", text: "• Clear, well-structured format for easy understanding" },
+  { id: "style", label: "Professional Style", text: "• Professional and engaging writing style" },
+  { id: "examples", label: "Include Examples", text: "• Relevant examples and context where appropriate" },
+  { id: "detail", label: "Attention to Detail", text: "• Attention to detail and accuracy" },
+  { id: "actionable", label: "Actionable Information", text: "• Actionable and practical information" },
+];
+
 const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [improvedPrompt, setImprovedPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("gpt-4");
+  const [selectedEnhancements, setSelectedEnhancements] = useState<string[]>(
+    availableEnhancements.map(e => e.id)
+  );
   const { toast } = useToast();
 
   // Update prompt when initialPrompt changes
@@ -23,6 +43,14 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       setImprovedPrompt(""); // Clear previous improved prompt
     }
   }, [initialPrompt]);
+
+  const toggleEnhancement = (enhancementId: string) => {
+    setSelectedEnhancements(prev => 
+      prev.includes(enhancementId)
+        ? prev.filter(id => id !== enhancementId)
+        : [...prev, enhancementId]
+    );
+  };
 
   const improvePrompt = async () => {
     if (!prompt.trim()) {
@@ -49,17 +77,19 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       
       const baseTask = originalPrompt.charAt(0).toLowerCase() + originalPrompt.slice(1);
       
-      // Create a structured prompt with main instruction and bullet points
-      const structuredPrompt = [
-        `${modelPrefix}, ${baseTask.replace(/\.$/, '')}, ensuring:`,
-        '',
-        '• High quality output with professional standards',
-        '• Clear, well-structured format for easy understanding',
-        '• Professional and engaging writing style',
-        '• Relevant examples and context where appropriate',
-        '• Attention to detail and accuracy',
-        '• Actionable and practical information'
-      ].join('\n');
+      // Get selected enhancement bullet points
+      const selectedBullets = availableEnhancements
+        .filter(e => selectedEnhancements.includes(e.id))
+        .map(e => e.text);
+      
+      // Create a structured prompt with main instruction and selected bullet points
+      const structuredPrompt = selectedBullets.length > 0
+        ? [
+            `${modelPrefix}, ${baseTask.replace(/\.$/, '')}, ensuring:`,
+            '',
+            ...selectedBullets
+          ].join('\n')
+        : `${modelPrefix}, ${baseTask.replace(/\.$/, '')}.`;
       
       setImprovedPrompt(structuredPrompt);
       
@@ -136,6 +166,27 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
             onChange={(e) => setPrompt(e.target.value)}
             className="min-h-[100px] resize-none"
           />
+        </div>
+
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Enhancement Options</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-lg border border-border bg-muted/30">
+            {availableEnhancements.map((enhancement) => (
+              <div key={enhancement.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={enhancement.id}
+                  checked={selectedEnhancements.includes(enhancement.id)}
+                  onCheckedChange={() => toggleEnhancement(enhancement.id)}
+                />
+                <Label
+                  htmlFor={enhancement.id}
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {enhancement.label}
+                </Label>
+              </div>
+            ))}
+          </div>
         </div>
 
         <Button
