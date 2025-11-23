@@ -5,7 +5,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Loader2, Copy, Wand2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Loader2, Copy, Wand2, Info } from "lucide-react";
 
 interface PromptImproverProps {
   initialPrompt?: string;
@@ -15,15 +16,46 @@ interface Enhancement {
   id: string;
   label: string;
   text: string;
+  description: string;
 }
 
 const availableEnhancements: Enhancement[] = [
-  { id: "quality", label: "High Quality Output", text: "• High quality output with professional standards" },
-  { id: "format", label: "Clear Structure", text: "• Clear, well-structured format for easy understanding" },
-  { id: "style", label: "Professional Style", text: "• Professional and engaging writing style" },
-  { id: "examples", label: "Include Examples", text: "• Relevant examples and context where appropriate" },
-  { id: "detail", label: "Attention to Detail", text: "• Attention to detail and accuracy" },
-  { id: "actionable", label: "Actionable Information", text: "• Actionable and practical information" },
+  { 
+    id: "quality", 
+    label: "High Quality Output", 
+    text: "• High quality output with professional standards",
+    description: "Ensures the response meets professional standards with accurate, reliable, and well-researched information suitable for professional use."
+  },
+  { 
+    id: "format", 
+    label: "Clear Structure", 
+    text: "• Clear, well-structured format for easy understanding",
+    description: "Organizes information in a logical, hierarchical way with clear headings, sections, and flow that makes content easy to scan and understand."
+  },
+  { 
+    id: "style", 
+    label: "Professional Style", 
+    text: "• Professional and engaging writing style",
+    description: "Uses appropriate tone and language that is both professional and engaging, avoiding jargon when possible while maintaining credibility."
+  },
+  { 
+    id: "examples", 
+    label: "Include Examples", 
+    text: "• Relevant examples and context where appropriate",
+    description: "Provides concrete, real-world examples and contextual information to illustrate concepts and make abstract ideas more tangible and relatable."
+  },
+  { 
+    id: "detail", 
+    label: "Attention to Detail", 
+    text: "• Attention to detail and accuracy",
+    description: "Ensures precision in facts, figures, and explanations, double-checking information and avoiding generalizations or oversimplifications."
+  },
+  { 
+    id: "actionable", 
+    label: "Actionable Information", 
+    text: "• Actionable and practical information",
+    description: "Focuses on providing practical steps, clear recommendations, and implementable solutions rather than just theoretical knowledge."
+  },
 ];
 
 const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
@@ -190,23 +222,33 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                 : "Select All"}
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-lg border border-border bg-muted/30">
-            {availableEnhancements.map((enhancement) => (
-              <div key={enhancement.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={enhancement.id}
-                  checked={selectedEnhancements.includes(enhancement.id)}
-                  onCheckedChange={() => toggleEnhancement(enhancement.id)}
-                />
-                <Label
-                  htmlFor={enhancement.id}
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  {enhancement.label}
-                </Label>
-              </div>
-            ))}
-          </div>
+          <TooltipProvider>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-lg border border-border bg-muted/30">
+              {availableEnhancements.map((enhancement) => (
+                <div key={enhancement.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={enhancement.id}
+                    checked={selectedEnhancements.includes(enhancement.id)}
+                    onCheckedChange={() => toggleEnhancement(enhancement.id)}
+                  />
+                  <Label
+                    htmlFor={enhancement.id}
+                    className="text-sm font-normal cursor-pointer flex-1"
+                  >
+                    {enhancement.label}
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="text-sm">{enhancement.description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              ))}
+            </div>
+          </TooltipProvider>
         </div>
 
         <Button
