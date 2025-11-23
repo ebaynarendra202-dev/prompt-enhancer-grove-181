@@ -52,6 +52,14 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
     );
   };
 
+  const toggleSelectAll = () => {
+    if (selectedEnhancements.length === availableEnhancements.length) {
+      setSelectedEnhancements([]);
+    } else {
+      setSelectedEnhancements(availableEnhancements.map(e => e.id));
+    }
+  };
+
   const improvePrompt = async () => {
     if (!prompt.trim()) {
       toast({
@@ -169,7 +177,19 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
         </div>
 
         <div className="space-y-3">
-          <label className="text-sm font-medium">Enhancement Options</label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium">Enhancement Options</label>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleSelectAll}
+              className="h-8"
+            >
+              {selectedEnhancements.length === availableEnhancements.length 
+                ? "Deselect All" 
+                : "Select All"}
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-lg border border-border bg-muted/30">
             {availableEnhancements.map((enhancement) => (
               <div key={enhancement.id} className="flex items-center space-x-2">
