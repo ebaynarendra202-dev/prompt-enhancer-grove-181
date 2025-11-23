@@ -6,7 +6,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Loader2, Copy, Wand2, Info } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Loader2, Copy, Wand2, Info, History, Clock } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface PromptImproverProps {
   initialPrompt?: string;
@@ -17,6 +20,14 @@ interface Enhancement {
   label: string;
   text: string;
   description: string;
+}
+
+interface PromptHistory {
+  id: string;
+  originalPrompt: string;
+  improvedPrompt: string;
+  model: string;
+  timestamp: number;
 }
 
 const availableEnhancements: Enhancement[] = [
@@ -67,7 +78,20 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
     availableEnhancements.map(e => e.id)
   );
   const [showComparison, setShowComparison] = useState(false);
+  const [history, setHistory] = useState<PromptHistory[]>([]);
   const { toast } = useToast();
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem("promptHistory");
+      if (savedHistory) {
+        setHistory(JSON.parse(savedHistory));
+      }
+    } catch (error) {
+      console.error("Failed to load history:", error);
+    }
+  }, []);
 
   // Update prompt when initialPrompt changes
   useEffect(() => {
@@ -134,6 +158,25 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       
       setImprovedPrompt(structuredPrompt);
       
+      // Add to history
+      const newHistoryItem: PromptHistory = {
+        id: Date.now().toString(),
+        originalPrompt: originalPrompt,
+        improvedPrompt: structuredPrompt,
+        model: selectedModel,
+        timestamp: Date.now(),
+      };
+      
+      const updatedHistory = [newHistoryItem, ...history].slice(0, 10);
+      setHistory(updatedHistory);
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem("promptHistory", JSON.stringify(updatedHistory));
+      } catch (error) {
+        console.error("Failed to save history:", error);
+      }
+      
       // Track the improvement in analytics
       const { trackPromptImprovement } = await import("@/hooks/useAnalytics");
       await trackPromptImprovement(originalPrompt, structuredPrompt, selectedModel);
@@ -151,6 +194,28 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const loadFromHistory = (historyItem: PromptHistory) => {
+    setPrompt(historyItem.originalPrompt);
+    setImprovedPrompt(historyItem.improvedPrompt);
+    setSelectedModel(historyItem.model);
+    setShowComparison(false);
+    
+    toast({
+      title: "History loaded",
+      description: "Previous prompt has been restored",
+    });
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem("promptHistory");
+    
+    toast({
+      title: "History cleared",
+      description: "All prompt history has been deleted",
+    });
   };
 
   const copyToClipboard = async () => {
@@ -172,9 +237,81 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   return (
     <div className="w-full max-w-3xl mx-auto p-6 space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">
-          AI Prompt Improver
-        </h1>
+        <div className="flex items-center justify-center gap-3">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">
+            AI Prompt Improver
+          </h1>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <History className="h-4 w-4" />
+                History {history.length > 0 && `(${history.length})`}
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-lg">
+              <SheetHeader>
+                <SheetTitle>Prompt History</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 space-y-4">
+                {history.length > 0 ? (
+                  <>
+                    <div className="flex justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearHistory}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        Clear All
+                      </Button>
+                    </div>
+                    <ScrollArea className="h-[calc(100vh-200px)]">
+                      <div className="space-y-4 pr-4">
+                        {history.map((item) => (
+                          <div
+                            key={item.id}
+                            className="border border-border rounded-lg p-4 space-y-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                            onClick={() => loadFromHistory(item)}
+                          >
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span className="font-medium uppercase">{item.model}</span>
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {formatDistanceToNow(item.timestamp, { addSuffix: true })}
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div>
+                                <div className="text-xs font-medium text-muted-foreground mb-1">
+                                  Original:
+                                </div>
+                                <p className="text-sm line-clamp-2">{item.originalPrompt}</p>
+                              </div>
+                              <div>
+                                <div className="text-xs font-medium text-brand-600 mb-1">
+                                  Improved:
+                                </div>
+                                <p className="text-sm line-clamp-3 text-muted-foreground">
+                                  {item.improvedPrompt}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No history yet</p>
+                    <p className="text-sm">Improved prompts will appear here</p>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
         <p className="text-muted-foreground">
           Enter your prompt below and let AI help you make it better
         </p>
