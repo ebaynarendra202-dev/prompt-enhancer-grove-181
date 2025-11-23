@@ -66,6 +66,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [selectedEnhancements, setSelectedEnhancements] = useState<string[]>(
     availableEnhancements.map(e => e.id)
   );
+  const [showComparison, setShowComparison] = useState(false);
   const { toast } = useToast();
 
   // Update prompt when initialPrompt changes
@@ -272,22 +273,60 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
         {improvedPrompt && (
           <div className="space-y-2 animate-in fade-in-50">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Improved Version</label>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={copyToClipboard}
-                className="h-8"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy
-              </Button>
-            </div>
-            <div className="relative rounded-lg border border-brand-200 bg-gradient-to-r from-brand-50/50 to-brand-100/50 p-4">
-              <div className="text-sm text-foreground whitespace-pre-wrap font-medium leading-relaxed">
-                {improvedPrompt}
+              <label className="text-sm font-medium">
+                {showComparison ? "Comparison View" : "Improved Version"}
+              </label>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowComparison(!showComparison)}
+                  className="h-8"
+                >
+                  {showComparison ? "Hide Original" : "Compare"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={copyToClipboard}
+                  className="h-8"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy
+                </Button>
               </div>
             </div>
+            
+            {showComparison ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Original Prompt
+                  </div>
+                  <div className="relative rounded-lg border border-border bg-muted/30 p-4 h-full">
+                    <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                      {prompt}
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs font-medium text-brand-600 uppercase tracking-wide">
+                    Improved Version
+                  </div>
+                  <div className="relative rounded-lg border border-brand-200 bg-gradient-to-r from-brand-50/50 to-brand-100/50 p-4 h-full">
+                    <div className="text-sm text-foreground whitespace-pre-wrap font-medium leading-relaxed">
+                      {improvedPrompt}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative rounded-lg border border-brand-200 bg-gradient-to-r from-brand-50/50 to-brand-100/50 p-4">
+                <div className="text-sm text-foreground whitespace-pre-wrap font-medium leading-relaxed">
+                  {improvedPrompt}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
