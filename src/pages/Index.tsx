@@ -6,7 +6,7 @@ import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wand2, BarChart3, LogOut } from "lucide-react";
+import { Wand2, BarChart3, LogOut, User } from "lucide-react";
 import { trackTemplateUsage, useAnalytics } from "@/hooks/useAnalytics";
 import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 import { useAuth } from "@/hooks/useAuth";
@@ -59,10 +59,16 @@ const Index = () => {
             <h1 className="text-2xl font-bold text-foreground">Prompt Improver</h1>
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
-          <Button variant="outline" onClick={signOut} className="flex items-center gap-2">
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate('/profile')} className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Profile
+            </Button>
+            <Button variant="outline" onClick={signOut} className="flex items-center gap-2">
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
