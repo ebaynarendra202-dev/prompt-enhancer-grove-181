@@ -21,6 +21,7 @@ export type Database = {
           id: string
           improved_prompt: string
           original_prompt: string
+          user_id: string | null
         }
         Insert: {
           ai_model: string
@@ -28,6 +29,7 @@ export type Database = {
           id?: string
           improved_prompt: string
           original_prompt: string
+          user_id?: string | null
         }
         Update: {
           ai_model?: string
@@ -35,6 +37,7 @@ export type Database = {
           id?: string
           improved_prompt?: string
           original_prompt?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -44,18 +47,21 @@ export type Database = {
           id: string
           template_category: string
           template_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           template_category: string
           template_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           template_category?: string
           template_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
