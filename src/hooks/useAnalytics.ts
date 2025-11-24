@@ -100,9 +100,12 @@ export const useAnalytics = () => {
 };
 
 export const trackTemplateUsage = async (templateId: string, category: string) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
   await supabase.from("template_usage").insert({
     template_id: templateId,
     template_category: category,
+    user_id: user?.id || null,
   });
 };
 
@@ -111,9 +114,12 @@ export const trackPromptImprovement = async (
   improvedPrompt: string,
   aiModel: string
 ) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
   await supabase.from("prompt_improvements").insert({
     original_prompt: originalPrompt,
     improved_prompt: improvedPrompt,
     ai_model: aiModel,
+    user_id: user?.id || null,
   });
 };
