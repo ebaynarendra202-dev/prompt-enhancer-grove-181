@@ -156,6 +156,30 @@ export const useAuth = () => {
     }
   };
 
+  const updateEmail = async (newEmail: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        email: newEmail,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Verification email sent",
+        description: "Please check your new email address to confirm the change.",
+      });
+
+      return { error: null };
+    } catch (error: any) {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
   return {
     user,
     session,
@@ -165,5 +189,6 @@ export const useAuth = () => {
     signOut,
     resetPassword,
     updatePassword,
+    updateEmail,
   };
 };

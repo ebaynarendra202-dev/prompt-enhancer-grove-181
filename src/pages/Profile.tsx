@@ -7,17 +7,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { ArrowLeft, User, Loader2 } from "lucide-react";
+import { ArrowLeft, User, Loader2, Mail } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Profile = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, updateEmail } = useAuth();
   const { profile, isLoading, updateProfile, isUpdating } = useProfile(user?.id);
   const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bio, setBio] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -40,6 +53,22 @@ const Profile = () => {
       avatar_url: avatarUrl || undefined,
       bio: bio || undefined,
     });
+  };
+
+  const handleEmailChange = async () => {
+    if (!newEmail || newEmail === user?.email) {
+      setShowEmailDialog(false);
+      return;
+    }
+
+    setIsUpdatingEmail(true);
+    const { error } = await updateEmail(newEmail);
+    setIsUpdatingEmail(false);
+    
+    if (!error) {
+      setShowEmailDialog(false);
+      setNewEmail("");
+    }
   };
 
   if (authLoading || isLoading) {
@@ -84,14 +113,24 @@ const Profile = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={user.email || ""}
-                  disabled
-                  className="bg-muted"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    value={user.email || ""}
+                    disabled
+                    className="bg-muted"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowEmailDialog(true)}
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Change
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  Your email address cannot be changed
+                  Changing your email requires verification
                 </p>
               </div>
 
@@ -180,6 +219,45 @@ const Profile = () => {
             </form>
           </CardContent>
         </Card>
+
+        <AlertDialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Change Email Address</AlertDialogTitle>
+              <AlertDialogDescription>
+                Enter your new email address. You'll need to verify it before the change takes effect.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="newEmail">New Email Address</Label>
+                <Input
+                  id="newEmail"
+                  type="email"
+                  placeholder="new@example.com"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                />
+              </div>
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isUpdatingEmail}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleEmailChange}
+                disabled={isUpdatingEmail || !newEmail}
+              >
+                {isUpdatingEmail ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Verification Email"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
