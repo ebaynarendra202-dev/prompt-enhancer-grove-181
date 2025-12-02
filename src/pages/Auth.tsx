@@ -7,10 +7,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { Wand2, Shield } from "lucide-react";
+import { Wand2, Shield, Key } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { verifyBackupCode } from "@/lib/backupCodes";
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
@@ -25,6 +26,9 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [mfaCode, setMfaCode] = useState("");
   const [showMfaChallenge, setShowMfaChallenge] = useState(false);
+  const [useBackupCode, setUseBackupCode] = useState(false);
+  const [backupCode, setBackupCode] = useState("");
+  const [mfaUserId, setMfaUserId] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ email?: string; password?: string; mfa?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
@@ -91,6 +95,7 @@ const Auth = () => {
       const hasMfa = factors?.totp?.some(f => f.status === 'verified');
       
       if (hasMfa) {
+        setMfaUserId(data.user?.id || null);
         setShowMfaChallenge(true);
         setIsLoading(false);
         return;
@@ -158,6 +163,46 @@ const Auth = () => {
     setIsLoading(false);
   };
 
+  const handleBackupCodeVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const cleanCode = backupCode.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (cleanCode.length !== 8) {
+      setErrors({ mfa: 'Please enter a valid backup code' });
+      return;
+    }
+
+    if (!mfaUserId) {
+      setErrors({ mfa: 'Session expired. Please try signing in again.' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const isValid = await verifyBackupCode(mfaUserId, backupCode);
+
+      if (!isValid) {
+        throw new Error('Invalid or already used backup code');
+      }
+
+      // Backup code verified - the user is already authenticated from initial sign-in
+      toast({
+        title: "Welcome back!",
+        description: "You've been signed in using a backup code.",
+      });
+
+      navigate('/');
+    } catch (error: any) {
+      setErrors({ mfa: error.message });
+      toast({
+        title: "Verification failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
+
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -211,46 +256,104 @@ const Auth = () => {
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <div className="p-3 bg-primary rounded-full">
-                <Shield className="h-6 w-6 text-primary-foreground" />
+                {useBackupCode ? (
+                  <Key className="h-6 w-6 text-primary-foreground" />
+                ) : (
+                  <Shield className="h-6 w-6 text-primary-foreground" />
+                )}
               </div>
             </div>
-            <CardTitle className="text-2xl">Two-Factor Authentication</CardTitle>
-            <CardDescription>Enter the 6-digit code from your authenticator app</CardDescription>
+            <CardTitle className="text-2xl">
+              {useBackupCode ? 'Use Backup Code' : 'Two-Factor Authentication'}
+            </CardTitle>
+            <CardDescription>
+              {useBackupCode 
+                ? 'Enter one of your backup codes to sign in'
+                : 'Enter the 6-digit code from your authenticator app'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleMfaVerify} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="mfa-code">Authentication Code</Label>
-                <Input
-                  id="mfa-code"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={6}
-                  value={mfaCode}
-                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
-                  placeholder="000000"
-                  className="text-center text-2xl tracking-widest"
-                  required
-                />
-                {errors.mfa && <p className="text-sm text-destructive">{errors.mfa}</p>}
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Verifying...' : 'Verify Code'}
-              </Button>
-              <Button 
-                type="button" 
-                variant="ghost" 
-                className="w-full" 
-                onClick={() => {
-                  setShowMfaChallenge(false);
-                  setMfaCode('');
-                  setErrors({});
-                }}
-              >
-                Back to Sign In
-              </Button>
-            </form>
+            {useBackupCode ? (
+              <form onSubmit={handleBackupCodeVerify} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="backup-code">Backup Code</Label>
+                  <Input
+                    id="backup-code"
+                    type="text"
+                    value={backupCode}
+                    onChange={(e) => setBackupCode(e.target.value.toUpperCase())}
+                    placeholder="XXXX-XXXX"
+                    className="text-center text-xl tracking-widest font-mono"
+                    required
+                  />
+                  {errors.mfa && <p className="text-sm text-destructive">{errors.mfa}</p>}
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Verifying...' : 'Verify Backup Code'}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="w-full" 
+                  onClick={() => {
+                    setUseBackupCode(false);
+                    setBackupCode('');
+                    setErrors({});
+                  }}
+                >
+                  Use authenticator app instead
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleMfaVerify} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="mfa-code">Authentication Code</Label>
+                  <Input
+                    id="mfa-code"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="000000"
+                    className="text-center text-2xl tracking-widest"
+                    required
+                  />
+                  {errors.mfa && <p className="text-sm text-destructive">{errors.mfa}</p>}
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Verifying...' : 'Verify Code'}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="link" 
+                  className="w-full" 
+                  onClick={() => {
+                    setUseBackupCode(true);
+                    setMfaCode('');
+                    setErrors({});
+                  }}
+                >
+                  Lost access to authenticator? Use backup code
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="w-full" 
+                  onClick={() => {
+                    setShowMfaChallenge(false);
+                    setMfaCode('');
+                    setUseBackupCode(false);
+                    setBackupCode('');
+                    setMfaUserId(null);
+                    setErrors({});
+                  }}
+                >
+                  Back to Sign In
+                </Button>
+              </form>
+            )}
           </CardContent>
         </Card>
       </div>

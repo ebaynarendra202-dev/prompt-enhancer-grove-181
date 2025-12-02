@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { ArrowLeft, User, Loader2, Mail, Shield, QrCode } from "lucide-react";
+import { ArrowLeft, User, Loader2, Mail, Shield, Key, Copy, RefreshCw } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -30,6 +30,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import QRCode from "qrcode";
+import { generateBackupCodes, getRemainingBackupCodes } from "@/lib/backupCodes";
 
 const Profile = () => {
   const { user, loading: authLoading, updateEmail } = useAuth();
@@ -51,6 +52,12 @@ const Profile = () => {
   const [mfaSecret, setMfaSecret] = useState("");
   const [verifyCode, setVerifyCode] = useState("");
   const [isEnrollingMfa, setIsEnrollingMfa] = useState(false);
+  
+  // Backup codes states
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [showBackupCodes, setShowBackupCodes] = useState(false);
+  const [remainingBackupCodes, setRemainingBackupCodes] = useState(0);
+  const [isGeneratingBackupCodes, setIsGeneratingBackupCodes] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -79,6 +86,11 @@ const Profile = () => {
       
       const hasTotpFactor = data?.totp?.some(factor => factor.status === 'verified');
       setMfaEnabled(!!hasTotpFactor);
+      
+      if (hasTotpFactor && user) {
+        const count = await getRemainingBackupCodes(user.id);
+        setRemainingBackupCodes(count);
+      }
     } catch (error: any) {
       console.error('Error checking MFA status:', error);
     }
@@ -136,9 +148,17 @@ const Profile = () => {
 
       if (verifyError) throw verifyError;
 
+      // Generate backup codes after successful MFA setup
+      if (user) {
+        const codes = await generateBackupCodes(user.id);
+        setBackupCodes(codes);
+        setRemainingBackupCodes(codes.length);
+        setShowBackupCodes(true);
+      }
+
       toast({
         title: "2FA enabled!",
-        description: "Two-factor authentication has been successfully enabled.",
+        description: "Two-factor authentication has been successfully enabled. Save your backup codes!",
       });
 
       setShowMfaSetup(false);
@@ -164,12 +184,18 @@ const Profile = () => {
       const { error } = await supabase.auth.mfa.unenroll({ factorId });
       if (error) throw error;
 
+      // Delete backup codes
+      if (user) {
+        await supabase.from('backup_codes').delete().eq('user_id', user.id);
+      }
+
       toast({
         title: "2FA disabled",
         description: "Two-factor authentication has been disabled.",
       });
 
       setMfaEnabled(false);
+      setRemainingBackupCodes(0);
     } catch (error: any) {
       toast({
         title: "Failed to disable 2FA",
@@ -177,6 +203,39 @@ const Profile = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleRegenerateBackupCodes = async () => {
+    if (!user) return;
+    
+    setIsGeneratingBackupCodes(true);
+    try {
+      const codes = await generateBackupCodes(user.id);
+      setBackupCodes(codes);
+      setRemainingBackupCodes(codes.length);
+      setShowBackupCodes(true);
+      
+      toast({
+        title: "Backup codes regenerated",
+        description: "Your old backup codes are no longer valid.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to generate codes",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    setIsGeneratingBackupCodes(false);
+  };
+
+  const copyBackupCodes = () => {
+    const text = backupCodes.join('\n');
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Backup codes copied to clipboard.",
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -287,13 +346,34 @@ const Profile = () => {
                   )}
                 </div>
                 {mfaEnabled ? (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handleUnenrollMfa}
-                  >
-                    Disable 2FA
-                  </Button>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Key className="h-4 w-4" />
+                      <span>{remainingBackupCodes} backup codes remaining</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handleRegenerateBackupCodes}
+                        disabled={isGeneratingBackupCodes}
+                      >
+                        {isGeneratingBackupCodes ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                        )}
+                        Regenerate Codes
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handleUnenrollMfa}
+                      >
+                        Disable 2FA
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
                   <Button 
                     type="button" 
@@ -508,6 +588,48 @@ const Profile = () => {
                   )}
                 </Button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showBackupCodes} onOpenChange={setShowBackupCodes}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Key className="h-5 w-5" />
+                Your Backup Codes
+              </DialogTitle>
+              <DialogDescription>
+                Save these codes in a safe place. Each code can only be used once to sign in if you lose access to your authenticator app.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2 p-4 bg-muted rounded-lg font-mono text-sm">
+                {backupCodes.map((code, index) => (
+                  <div key={index} className="p-2 bg-background rounded text-center">
+                    {code}
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={copyBackupCodes}
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy All
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => setShowBackupCodes(false)}
+                >
+                  Done
+                </Button>
+              </div>
+              <p className="text-xs text-destructive text-center">
+                Warning: These codes will only be shown once!
+              </p>
             </div>
           </DialogContent>
         </Dialog>
