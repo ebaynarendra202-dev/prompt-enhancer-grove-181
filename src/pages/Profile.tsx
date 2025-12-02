@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { ArrowLeft, User, Loader2, Mail, Shield, Key, Copy, RefreshCw } from "lucide-react";
+import { ArrowLeft, User, Loader2, Mail, Shield, Key, Copy, RefreshCw, Monitor, LogOut } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -58,6 +58,10 @@ const Profile = () => {
   const [showBackupCodes, setShowBackupCodes] = useState(false);
   const [remainingBackupCodes, setRemainingBackupCodes] = useState(0);
   const [isGeneratingBackupCodes, setIsGeneratingBackupCodes] = useState(false);
+  
+  // Session states
+  const [sessionCreatedAt, setSessionCreatedAt] = useState<string | null>(null);
+  const [isSigningOutAll, setIsSigningOutAll] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -76,8 +80,76 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       checkMfaStatus();
+      fetchSessionInfo();
     }
   }, [user]);
+
+  const fetchSessionInfo = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // Use expires_at to estimate when the session was created (sessions typically last 1 hour)
+        const expiresAt = session.expires_at ? session.expires_at * 1000 : Date.now() + 3600000;
+        const estimatedCreatedAt = new Date(expiresAt - 3600000).toISOString();
+        setSessionCreatedAt(estimatedCreatedAt);
+      }
+    } catch (error) {
+      console.error('Error fetching session:', error);
+    }
+  };
+
+  const handleSignOutAllDevices = async () => {
+    setIsSigningOutAll(true);
+    try {
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      if (error) throw error;
+      
+      toast({
+        title: "Signed out from all devices",
+        description: "All your sessions have been terminated.",
+      });
+      
+      navigate('/auth');
+    } catch (error: any) {
+      toast({
+        title: "Failed to sign out",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    setIsSigningOutAll(false);
+  };
+
+  const handleSignOutCurrentDevice = async () => {
+    try {
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
+      if (error) throw error;
+      
+      toast({
+        title: "Signed out",
+        description: "You've been signed out from this device.",
+      });
+      
+      navigate('/auth');
+    } catch (error: any) {
+      toast({
+        title: "Failed to sign out",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const formatSessionDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   const checkMfaStatus = async () => {
     try {
@@ -394,6 +466,71 @@ const Profile = () => {
                     )}
                   </Button>
                 )}
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Session Management</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Manage your active sessions across devices
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="gap-1">
+                    <Monitor className="h-3 w-3" />
+                    Current Device
+                  </Badge>
+                </div>
+                
+                {sessionCreatedAt && (
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Monitor className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">This Session</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        Started: {formatSessionDate(sessionCreatedAt)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Browser: {navigator.userAgent.split(' ').slice(-2, -1)[0]?.split('/')[0] || 'Unknown'}
+                    </p>
+                  </div>
+                )}
+                
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleSignOutCurrentDevice}
+                    className="flex-1"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out This Device
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleSignOutAllDevices}
+                    disabled={isSigningOutAll}
+                    className="flex-1"
+                  >
+                    {isSigningOutAll ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Signing Out...
+                      </>
+                    ) : (
+                      <>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out All Devices
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
 
               <Separator />
