@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Copy, Wand2, Info, History, Clock } from "lucide-react";
+import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface PromptImproverProps {
   initialPrompt?: string;
@@ -80,6 +81,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [showComparison, setShowComparison] = useState(false);
   const [history, setHistory] = useState<PromptHistory[]>([]);
   const { toast } = useToast();
+  const { favorites, addFavorite, removeFavorite, isAdding } = useFavorites();
 
   // Load history from localStorage on mount
   useEffect(() => {
@@ -234,6 +236,26 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
     }
   };
 
+  const handleAddFavorite = () => {
+    if (!prompt.trim() || !improvedPrompt.trim()) return;
+    addFavorite({
+      originalPrompt: prompt,
+      improvedPrompt: improvedPrompt,
+      aiModel: selectedModel,
+    });
+  };
+
+  const loadFromFavorite = (favorite: { original_prompt: string; improved_prompt: string; ai_model: string }) => {
+    setPrompt(favorite.original_prompt);
+    setImprovedPrompt(favorite.improved_prompt);
+    setSelectedModel(favorite.ai_model);
+    setShowComparison(false);
+    toast({
+      title: "Favorite loaded",
+      description: "Prompt has been restored from favorites",
+    });
+  };
+
   return (
     <div className="w-full max-w-3xl mx-auto p-6 space-y-8">
       <div className="text-center space-y-2">
@@ -241,58 +263,63 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">
             AI Prompt Improver
           </h1>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
-                <History className="h-4 w-4" />
-                History {history.length > 0 && `(${history.length})`}
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-full sm:max-w-lg">
-              <SheetHeader>
-                <SheetTitle>Prompt History</SheetTitle>
-              </SheetHeader>
-              <div className="mt-6 space-y-4">
-                {history.length > 0 ? (
-                  <>
-                    <div className="flex justify-end">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearHistory}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        Clear All
-                      </Button>
-                    </div>
-                    <ScrollArea className="h-[calc(100vh-200px)]">
+          <div className="flex gap-2">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Star className="h-4 w-4" />
+                  Favorites {favorites.length > 0 && `(${favorites.length})`}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-full sm:max-w-lg">
+                <SheetHeader>
+                  <SheetTitle>Favorite Prompts</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 space-y-4">
+                  {favorites.length > 0 ? (
+                    <ScrollArea className="h-[calc(100vh-150px)]">
                       <div className="space-y-4 pr-4">
-                        {history.map((item) => (
+                        {favorites.map((fav) => (
                           <div
-                            key={item.id}
-                            className="border border-border rounded-lg p-4 space-y-3 hover:bg-muted/50 transition-colors cursor-pointer"
-                            onClick={() => loadFromHistory(item)}
+                            key={fav.id}
+                            className="border border-border rounded-lg p-4 space-y-3 hover:bg-muted/50 transition-colors"
                           >
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span className="font-medium uppercase">{item.model}</span>
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {formatDistanceToNow(item.timestamp, { addSuffix: true })}
+                              <span className="font-medium uppercase">{fav.ai_model}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {formatDistanceToNow(new Date(fav.created_at), { addSuffix: true })}
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 text-destructive hover:text-destructive"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeFavorite(fav.id);
+                                  }}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
                               </div>
                             </div>
-                            <div className="space-y-2">
+                            <div 
+                              className="space-y-2 cursor-pointer"
+                              onClick={() => loadFromFavorite(fav)}
+                            >
                               <div>
                                 <div className="text-xs font-medium text-muted-foreground mb-1">
                                   Original:
                                 </div>
-                                <p className="text-sm line-clamp-2">{item.originalPrompt}</p>
+                                <p className="text-sm line-clamp-2">{fav.original_prompt}</p>
                               </div>
                               <div>
                                 <div className="text-xs font-medium text-brand-600 mb-1">
                                   Improved:
                                 </div>
                                 <p className="text-sm line-clamp-3 text-muted-foreground">
-                                  {item.improvedPrompt}
+                                  {fav.improved_prompt}
                                 </p>
                               </div>
                             </div>
@@ -300,17 +327,87 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                         ))}
                       </div>
                     </ScrollArea>
-                  </>
-                ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No history yet</p>
-                    <p className="text-sm">Improved prompts will appear here</p>
-                  </div>
-                )}
-              </div>
-            </SheetContent>
-          </Sheet>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Star className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No favorites yet</p>
+                      <p className="text-sm">Star prompts to save them here</p>
+                    </div>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <History className="h-4 w-4" />
+                  History {history.length > 0 && `(${history.length})`}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-full sm:max-w-lg">
+                <SheetHeader>
+                  <SheetTitle>Prompt History</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 space-y-4">
+                  {history.length > 0 ? (
+                    <>
+                      <div className="flex justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearHistory}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          Clear All
+                        </Button>
+                      </div>
+                      <ScrollArea className="h-[calc(100vh-200px)]">
+                        <div className="space-y-4 pr-4">
+                          {history.map((item) => (
+                            <div
+                              key={item.id}
+                              className="border border-border rounded-lg p-4 space-y-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                              onClick={() => loadFromHistory(item)}
+                            >
+                              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                <span className="font-medium uppercase">{item.model}</span>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {formatDistanceToNow(item.timestamp, { addSuffix: true })}
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <div>
+                                  <div className="text-xs font-medium text-muted-foreground mb-1">
+                                    Original:
+                                  </div>
+                                  <p className="text-sm line-clamp-2">{item.originalPrompt}</p>
+                                </div>
+                                <div>
+                                  <div className="text-xs font-medium text-brand-600 mb-1">
+                                    Improved:
+                                  </div>
+                                  <p className="text-sm line-clamp-3 text-muted-foreground">
+                                    {item.improvedPrompt}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No history yet</p>
+                      <p className="text-sm">Improved prompts will appear here</p>
+                    </div>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
         <p className="text-muted-foreground">
           Enter your prompt below and let AI help you make it better
@@ -414,6 +511,16 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                 {showComparison ? "Comparison View" : "Improved Version"}
               </label>
               <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddFavorite}
+                  disabled={isAdding}
+                  className="h-8"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  {isAdding ? "Saving..." : "Favorite"}
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
