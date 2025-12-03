@@ -38,6 +38,36 @@ export type Database = {
         }
         Relationships: []
       }
+      favorites: {
+        Row: {
+          ai_model: string
+          created_at: string
+          id: string
+          improved_prompt: string
+          original_prompt: string
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_model: string
+          created_at?: string
+          id?: string
+          improved_prompt: string
+          original_prompt: string
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_model?: string
+          created_at?: string
+          id?: string
+          improved_prompt?: string
+          original_prompt?: string
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
