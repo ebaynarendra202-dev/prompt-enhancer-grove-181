@@ -1,4 +1,7 @@
 project_id = "lzjpvvcwoacwactqhlvq"
 
+[functions.improve-prompt]
+verify_jwt = false
+
 [functions.analyze-prompt]
 verify_jwt = false
