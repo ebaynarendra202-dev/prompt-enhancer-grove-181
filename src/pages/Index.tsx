@@ -10,6 +10,7 @@ import { Wand2, BarChart3, LogOut, User } from "lucide-react";
 import { trackTemplateUsage, useAnalytics } from "@/hooks/useAnalytics";
 import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const [selectedPrompt, setSelectedPrompt] = useState("");
@@ -41,7 +42,7 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-brand-50/50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -52,7 +53,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/50 py-12">
+    <div className="min-h-screen bg-background py-12">
       <div className="max-w-6xl mx-auto px-6 mb-8">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -60,6 +61,7 @@ const Index = () => {
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="outline" onClick={() => navigate('/profile')} className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Profile

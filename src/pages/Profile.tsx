@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { ArrowLeft, User, Loader2, Mail, Shield, Key, Copy, RefreshCw, Monitor, LogOut } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -337,7 +338,7 @@ const Profile = () => {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-brand-50/50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -348,16 +349,19 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/50 py-12">
+    <div className="min-h-screen bg-background py-12">
       <div className="max-w-3xl mx-auto px-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="mb-6 flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Button>
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+          <ThemeToggle />
+        </div>
 
         <Card>
           <CardHeader>

@@ -12,6 +12,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { verifyBackupCode } from "@/lib/backupCodes";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
@@ -265,7 +266,7 @@ const Auth = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-brand-50/50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -273,7 +274,10 @@ const Auth = () => {
 
   if (showMfaChallenge) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-brand-50/50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
@@ -384,7 +388,10 @@ const Auth = () => {
 
   if (showPasswordUpdate) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-brand-50/50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Update Password</CardTitle>
@@ -426,7 +433,10 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-brand-50/50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
