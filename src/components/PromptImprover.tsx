@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2 } from "lucide-react";
+import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useFavorites } from "@/hooks/useFavorites";
 import PromptQualityScore from "./PromptQualityScore";
+import PromptDiffView from "./PromptDiffView";
 
 interface PromptImproverProps {
   initialPrompt?: string;
@@ -80,6 +81,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
     availableEnhancements.map(e => e.id)
   );
   const [showComparison, setShowComparison] = useState(false);
+  const [showDiff, setShowDiff] = useState(false);
   const [history, setHistory] = useState<PromptHistory[]>([]);
   const { toast } = useToast();
   const { favorites, addFavorite, removeFavorite, isAdding } = useFavorites();
@@ -199,6 +201,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
     setImprovedPrompt(historyItem.improvedPrompt);
     setSelectedModel(historyItem.model);
     setShowComparison(false);
+    setShowDiff(false);
     
     toast({
       title: "History loaded",
@@ -246,6 +249,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
     setImprovedPrompt(favorite.improved_prompt);
     setSelectedModel(favorite.ai_model);
     setShowComparison(false);
+    setShowDiff(false);
     toast({
       title: "Favorite loaded",
       description: "Prompt has been restored from favorites",
@@ -506,7 +510,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
           <div className="space-y-2 animate-in fade-in-50">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">
-                {showComparison ? "Comparison View" : "Improved Version"}
+                {showDiff ? "Diff View" : showComparison ? "Comparison View" : "Improved Version"}
               </label>
               <div className="flex items-center gap-2">
                 <Button
@@ -520,9 +524,24 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                   {isAdding ? "Saving..." : "Favorite"}
                 </Button>
                 <Button
-                  variant="outline"
+                  variant={showDiff ? "secondary" : "outline"}
                   size="sm"
-                  onClick={() => setShowComparison(!showComparison)}
+                  onClick={() => {
+                    setShowDiff(!showDiff);
+                    if (!showDiff) setShowComparison(false);
+                  }}
+                  className="h-8"
+                >
+                  <GitCompare className="h-4 w-4 mr-2" />
+                  Diff
+                </Button>
+                <Button
+                  variant={showComparison ? "secondary" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setShowComparison(!showComparison);
+                    if (!showComparison) setShowDiff(false);
+                  }}
                   className="h-8"
                 >
                   {showComparison ? "Hide Original" : "Compare"}
@@ -539,7 +558,9 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
               </div>
             </div>
             
-            {showComparison ? (
+            {showDiff ? (
+              <PromptDiffView original={prompt} improved={improvedPrompt} />
+            ) : showComparison ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
