@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare } from "lucide-react";
+import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare, Keyboard } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useFavorites } from "@/hooks/useFavorites";
 import PromptQualityScore from "./PromptQualityScore";
@@ -85,6 +85,44 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [history, setHistory] = useState<PromptHistory[]>([]);
   const { toast } = useToast();
   const { favorites, addFavorite, removeFavorite, isAdding } = useFavorites();
+
+  // Keyboard shortcuts handler
+  const handleKeyboardShortcuts = useCallback((e: KeyboardEvent) => {
+    // Ctrl/Cmd + Enter to improve prompt
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (prompt.trim() && !isLoading) {
+        improvePrompt();
+      }
+    }
+    
+    // Ctrl/Cmd + Shift + C to copy improved prompt
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+      e.preventDefault();
+      if (improvedPrompt) {
+        copyToClipboard();
+      }
+    }
+    
+    // Escape to clear input (only when not in a sheet/modal)
+    if (e.key === 'Escape' && !document.querySelector('[data-state="open"]')) {
+      e.preventDefault();
+      if (prompt.trim()) {
+        setPrompt('');
+        setImprovedPrompt('');
+        toast({
+          title: "Cleared",
+          description: "Input has been cleared",
+        });
+      }
+    }
+  }, [prompt, improvedPrompt, isLoading]);
+
+  // Register keyboard shortcuts
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyboardShortcuts);
+    return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
+  }, [handleKeyboardShortcuts]);
 
   // Load history from localStorage on mount
   useEffect(() => {
@@ -412,6 +450,18 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
         <p className="text-muted-foreground">
           Enter your prompt below and let AI help you make it better
         </p>
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground mt-2">
+          <span className="flex items-center gap-1">
+            <Keyboard className="h-3 w-3" />
+            Shortcuts:
+          </span>
+          <span className="bg-muted px-1.5 py-0.5 rounded font-mono">Ctrl+Enter</span>
+          <span>Improve</span>
+          <span className="bg-muted px-1.5 py-0.5 rounded font-mono">Ctrl+Shift+C</span>
+          <span>Copy</span>
+          <span className="bg-muted px-1.5 py-0.5 rounded font-mono">Esc</span>
+          <span>Clear</span>
+        </div>
       </div>
 
       <div className="space-y-4">
