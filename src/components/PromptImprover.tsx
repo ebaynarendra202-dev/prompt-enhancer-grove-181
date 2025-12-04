@@ -132,32 +132,27 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
 
     setIsLoading(true);
     try {
-      // Simulate AI improvement
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
       const originalPrompt = prompt.trim();
       
-      // Build structured improvement with bullet points
-      const modelPrefix = selectedModel.includes('claude') ? 'Using advanced reasoning' :
-                         selectedModel.includes('gpt-4') ? 'With high-level analysis' :
-                         selectedModel.includes('gemini') ? 'Through comprehensive understanding' :
-                         'Using AI assistance';
-      
-      const baseTask = originalPrompt.charAt(0).toLowerCase() + originalPrompt.slice(1);
-      
-      // Get selected enhancement bullet points
-      const selectedBullets = availableEnhancements
-        .filter(e => selectedEnhancements.includes(e.id))
-        .map(e => e.text);
-      
-      // Create a structured prompt with main instruction and selected bullet points
-      const structuredPrompt = selectedBullets.length > 0
-        ? [
-            `${modelPrefix}, ${baseTask.replace(/\.$/, '')}, ensuring:`,
-            '',
-            ...selectedBullets
-          ].join('\n')
-        : `${modelPrefix}, ${baseTask.replace(/\.$/, '')}.`;
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/improve-prompt`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: originalPrompt,
+          model: selectedModel,
+          enhancements: selectedEnhancements,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to improve prompt');
+      }
+
+      const data = await response.json();
+      const structuredPrompt = data.improvedPrompt;
       
       setImprovedPrompt(structuredPrompt);
       
@@ -186,7 +181,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       
       toast({
         title: "Prompt improved!",
-        description: `Enhanced with structured bullet points using ${selectedModel.toUpperCase()}.`,
+        description: "Your prompt has been enhanced using AI.",
       });
     } catch (error) {
       toast({
