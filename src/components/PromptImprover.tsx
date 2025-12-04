@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useFavorites } from "@/hooks/useFavorites";
+import PromptQualityScore from "./PromptQualityScore";
 
 interface PromptImproverProps {
   initialPrompt?: string;
@@ -442,6 +443,8 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
             className="min-h-[100px] resize-none"
           />
         </div>
+
+        <PromptQualityScore prompt={prompt} />
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
