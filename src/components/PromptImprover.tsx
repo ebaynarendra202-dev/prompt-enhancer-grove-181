@@ -86,6 +86,12 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const { toast } = useToast();
   const { favorites, addFavorite, removeFavorite, isAdding } = useFavorites();
 
+  // Character and word count with limits
+  const charLimit = 5000;
+  const wordLimit = 1000;
+  const charCount = prompt.length;
+  const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
+
   // Keyboard shortcuts handler
   const handleKeyboardShortcuts = useCallback((e: KeyboardEvent) => {
     // Ctrl/Cmd + Enter to improve prompt
@@ -491,6 +497,19 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
             onChange={(e) => setPrompt(e.target.value)}
             className="min-h-[100px] resize-none"
           />
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <span className={charCount > charLimit ? "text-destructive font-medium" : ""}>
+                {charCount.toLocaleString()} / {charLimit.toLocaleString()} characters
+              </span>
+              <span className={wordCount > wordLimit ? "text-destructive font-medium" : ""}>
+                {wordCount.toLocaleString()} / {wordLimit.toLocaleString()} words
+              </span>
+            </div>
+            {(charCount > charLimit || wordCount > wordLimit) && (
+              <span className="text-destructive text-xs">Limit exceeded</span>
+            )}
+          </div>
         </div>
 
         <PromptQualityScore prompt={prompt} />
