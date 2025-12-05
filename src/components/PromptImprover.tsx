@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare, Keyboard } from "lucide-react";
+import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare, Keyboard, Download, Upload } from "lucide-react";
+import { exportData, parseBackupFile, PromptHistory } from "@/lib/dataBackup";
+import { useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useFavorites } from "@/hooks/useFavorites";
 import PromptQualityScore from "./PromptQualityScore";
@@ -25,13 +27,6 @@ interface Enhancement {
   description: string;
 }
 
-interface PromptHistory {
-  id: string;
-  originalPrompt: string;
-  improvedPrompt: string;
-  model: string;
-  timestamp: number;
-}
 
 const availableEnhancements: Enhancement[] = [
   { 
@@ -85,6 +80,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [history, setHistory] = useState<PromptHistory[]>([]);
   const { toast } = useToast();
   const { favorites, addFavorite, removeFavorite, isAdding } = useFavorites();
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   // Character and word count with limits
   const charLimit = 5000;
@@ -261,6 +257,51 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       title: "History cleared",
       description: "All prompt history has been deleted",
     });
+  };
+
+  const handleExport = () => {
+    exportData(
+      favorites,
+      history,
+      { selectedModel, selectedEnhancements }
+    );
+    toast({
+      title: "Data exported",
+      description: "Your backup file has been downloaded",
+    });
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const data = await parseBackupFile(file);
+      
+      // Restore history
+      setHistory(data.history);
+      localStorage.setItem("promptHistory", JSON.stringify(data.history));
+      
+      // Restore settings
+      setSelectedModel(data.settings.selectedModel);
+      setSelectedEnhancements(data.settings.selectedEnhancements);
+      
+      toast({
+        title: "Data imported",
+        description: `Restored ${data.history.length} history items and settings. Note: Favorites require re-adding manually as they are user-specific.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Import failed",
+        description: error instanceof Error ? error.message : "Failed to import backup",
+        variant: "destructive",
+      });
+    }
+    
+    // Reset input
+    if (importInputRef.current) {
+      importInputRef.current.value = "";
+    }
   };
 
   const copyToClipboard = async () => {
@@ -451,6 +492,21 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                 </div>
               </SheetContent>
             </Sheet>
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => importInputRef.current?.click()}>
+              <Upload className="h-4 w-4" />
+              Import
+            </Button>
+            <input
+              ref={importInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
           </div>
         </div>
         <p className="text-muted-foreground">
