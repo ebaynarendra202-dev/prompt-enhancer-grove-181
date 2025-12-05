@@ -13,8 +13,10 @@ import { exportData, parseBackupFile, PromptHistory } from "@/lib/dataBackup";
 import { useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useFavorites } from "@/hooks/useFavorites";
+import { usePromptVersions, PromptVersion } from "@/hooks/usePromptVersions";
 import PromptQualityScore from "./PromptQualityScore";
 import PromptDiffView from "./PromptDiffView";
+import PromptVersionHistory from "./PromptVersionHistory";
 
 interface PromptImproverProps {
   initialPrompt?: string;
@@ -80,6 +82,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [history, setHistory] = useState<PromptHistory[]>([]);
   const { toast } = useToast();
   const { favorites, addFavorite, removeFavorite, isAdding } = useFavorites();
+  const { versionGroups, addVersion, deleteGroup, deleteVersion, clearAllVersions } = usePromptVersions();
   const importInputRef = useRef<HTMLInputElement>(null);
 
   // Character and word count with limits
@@ -221,6 +224,9 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       const { trackPromptImprovement } = await import("@/hooks/useAnalytics");
       await trackPromptImprovement(originalPrompt, structuredPrompt, selectedModel);
       
+      // Add to version history
+      addVersion(originalPrompt, structuredPrompt, selectedModel);
+      
       toast({
         title: "Prompt improved!",
         description: "Your prompt has been enhanced using AI.",
@@ -338,6 +344,18 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
     toast({
       title: "Favorite loaded",
       description: "Prompt has been restored from favorites",
+    });
+  };
+
+  const loadFromVersion = (version: PromptVersion) => {
+    setPrompt(version.prompt);
+    setImprovedPrompt(version.improvedPrompt);
+    setSelectedModel(version.model);
+    setShowComparison(false);
+    setShowDiff(false);
+    toast({
+      title: "Version loaded",
+      description: `Loaded version ${version.versionNumber}`,
     });
   };
 
@@ -492,6 +510,13 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                 </div>
               </SheetContent>
             </Sheet>
+            <PromptVersionHistory
+              versionGroups={versionGroups}
+              onLoadVersion={loadFromVersion}
+              onDeleteGroup={deleteGroup}
+              onDeleteVersion={deleteVersion}
+              onClearAll={clearAllVersions}
+            />
             <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
               <Download className="h-4 w-4" />
               Export
