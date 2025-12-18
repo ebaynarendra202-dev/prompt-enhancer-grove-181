@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare, Keyboard, Download, Upload } from "lucide-react";
 import { exportData, parseBackupFile, PromptHistory } from "@/lib/dataBackup";
+import PromptShareDialog from "./PromptShareDialog";
 import { useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -673,6 +674,11 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                   <Star className="h-4 w-4 mr-2" />
                   {isAdding ? "Saving..." : "Favorite"}
                 </Button>
+                <PromptShareDialog
+                  originalPrompt={prompt}
+                  improvedPrompt={improvedPrompt}
+                  aiModel={selectedModel}
+                />
                 <Button
                   variant={showDiff ? "secondary" : "outline"}
                   size="sm"
