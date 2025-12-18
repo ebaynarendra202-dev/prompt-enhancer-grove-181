@@ -125,6 +125,42 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_prompts: {
+        Row: {
+          ai_model: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          improved_prompt: string
+          original_prompt: string
+          share_id: string
+          view_count: number
+        }
+        Insert: {
+          ai_model: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          improved_prompt: string
+          original_prompt: string
+          share_id?: string
+          view_count?: number
+        }
+        Update: {
+          ai_model?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          improved_prompt?: string
+          original_prompt?: string
+          share_id?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       template_usage: {
         Row: {
           created_at: string
