@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { promptTemplates, TEMPLATE_CATEGORIES, TemplateCategory, PromptTemplate } from "@/types/templates";
-import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus } from "lucide-react";
+import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil } from "lucide-react";
 import { useCustomTemplates, CustomTemplate } from "@/hooks/useCustomTemplates";
 import CreateTemplateDialog from "./CreateTemplateDialog";
+import EditTemplateDialog from "./EditTemplateDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -270,81 +271,102 @@ interface CustomTemplateCardProps {
 }
 
 const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting }: CustomTemplateCardProps) => {
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  
   const categoryLabel = template.category === "custom" 
     ? "Custom" 
     : TEMPLATE_CATEGORIES[template.category as TemplateCategory]?.label || template.category;
 
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer group" onClick={onSelect}>
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg group-hover:text-brand-600 transition-colors">
-            {template.title}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="ml-2">
-              {categoryLabel}
-            </Badge>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Template?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete "{template.title}". This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete();
-                    }}
-                    disabled={isDeleting}
-                    className="bg-destructive hover:bg-destructive/90"
+    <>
+      <Card className="hover:shadow-md transition-shadow cursor-pointer group" onClick={onSelect}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <CardTitle className="text-lg group-hover:text-brand-600 transition-colors">
+              {template.title}
+            </CardTitle>
+            <div className="flex items-center gap-1">
+              <Badge variant="outline" className="ml-2">
+                {categoryLabel}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditDialogOpen(true);
+                }}
+              >
+                <Pencil className="h-4 w-4 text-muted-foreground" />
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    {isDeleting ? "Deleting..." : "Delete"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Template?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete "{template.title}". This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                      }}
+                      disabled={isDeleting}
+                      className="bg-destructive hover:bg-destructive/90"
+                    >
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
-        </div>
-        <CardDescription>{template.description || "No description"}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-sm text-muted-foreground line-clamp-2 italic">
-          "{template.prompt}"
-        </p>
-        <div className="flex flex-wrap gap-1">
-          {template.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        <Button
-          size="sm"
-          className="w-full bg-brand-600 hover:bg-brand-700"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelect();
-          }}
-        >
-          Use Template
-        </Button>
-      </CardContent>
-    </Card>
+          <CardDescription>{template.description || "No description"}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground line-clamp-2 italic">
+            "{template.prompt}"
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {template.tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <Button
+            size="sm"
+            className="w-full bg-brand-600 hover:bg-brand-700"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect();
+            }}
+          >
+            Use Template
+          </Button>
+        </CardContent>
+      </Card>
+      
+      <EditTemplateDialog
+        template={template}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+    </>
   );
 };
 
