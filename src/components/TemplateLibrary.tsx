@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { promptTemplates, TEMPLATE_CATEGORIES, TemplateCategory, PromptTemplate } from "@/types/templates";
-import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy } from "lucide-react";
+import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy, Star } from "lucide-react";
 import { useCustomTemplates, CustomTemplate } from "@/hooks/useCustomTemplates";
+import { useTemplateFavorites } from "@/hooks/useTemplateFavorites";
 import CreateTemplateDialog from "./CreateTemplateDialog";
 import EditTemplateDialog from "./EditTemplateDialog";
 import {
@@ -25,20 +26,22 @@ interface TemplateLibraryProps {
   onSelectTemplate: (prompt: string, templateId: string, category: string) => void;
 }
 
-const categoryIcons: Record<TemplateCategory | "custom", React.ComponentType<any>> = {
+const categoryIcons: Record<TemplateCategory | "custom" | "favorites", React.ComponentType<any>> = {
   code: Code,
   image: Image,
   content: FileText,
   research: Search,
   business: Briefcase,
   custom: User,
+  favorites: Star,
 };
 
 const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | "all" | "custom">("all");
+  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | "all" | "custom" | "favorites">("all");
   const [duplicateTemplate, setDuplicateTemplate] = useState<{ prompt: string; title: string; description?: string; category: string; tags: string[] } | null>(null);
   const { templates: customTemplates, deleteTemplate, isDeleting } = useCustomTemplates();
+  const { favorites, isFavorite, toggleFavorite, isToggling } = useTemplateFavorites();
 
   const filteredTemplates = promptTemplates.filter((template) => {
     const matchesSearch =
@@ -65,6 +68,10 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
   const getCategoryTemplates = (category: TemplateCategory) => {
     return filteredTemplates.filter((t) => t.category === category);
   };
+
+  // Get favorite templates
+  const favoriteBuiltinTemplates = promptTemplates.filter((t) => isFavorite(t.id, "builtin"));
+  const favoriteCustomTemplates = customTemplates.filter((t) => isFavorite(t.id, "custom"));
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 space-y-6">
@@ -107,9 +114,13 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
         />
       </div>
 
-      <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as TemplateCategory | "all" | "custom")}>
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
+      <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as TemplateCategory | "all" | "custom" | "favorites")}>
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
           <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="favorites" className="text-xs sm:text-sm">
+            <Star className="h-3 w-3 mr-1" />
+            Favorites
+          </TabsTrigger>
           <TabsTrigger value="custom" className="text-xs sm:text-sm">
             My Templates
           </TabsTrigger>
@@ -121,6 +132,54 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
         </TabsList>
 
         <TabsContent value="all" className="space-y-6 mt-6">
+          {/* Favorites Section */}
+          {(favoriteBuiltinTemplates.length > 0 || favoriteCustomTemplates.length > 0) && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                Favorites
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {favoriteBuiltinTemplates.map((template) => (
+                  <TemplateCard
+                    key={template.id}
+                    template={template}
+                    onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
+                    onDuplicate={() => setDuplicateTemplate({
+                      prompt: template.prompt,
+                      title: template.title,
+                      description: template.description,
+                      category: template.category,
+                      tags: template.tags,
+                    })}
+                    isFavorite={true}
+                    onToggleFavorite={() => toggleFavorite(template.id, "builtin")}
+                    isToggling={isToggling}
+                  />
+                ))}
+                {favoriteCustomTemplates.map((template) => (
+                  <CustomTemplateCard
+                    key={template.id}
+                    template={template}
+                    onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
+                    onDelete={() => deleteTemplate(template.id)}
+                    isDeleting={isDeleting}
+                    onDuplicate={() => setDuplicateTemplate({
+                      prompt: template.prompt,
+                      title: template.title,
+                      description: template.description,
+                      category: template.category,
+                      tags: template.tags,
+                    })}
+                    isFavorite={true}
+                    onToggleFavorite={() => toggleFavorite(template.id, "custom")}
+                    isToggling={isToggling}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Custom Templates Section */}
           {filteredCustomTemplates.length > 0 && (
             <div className="space-y-4">
@@ -143,6 +202,9 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                       category: template.category,
                       tags: template.tags,
                     })}
+                    isFavorite={isFavorite(template.id, "custom")}
+                    onToggleFavorite={() => toggleFavorite(template.id, "custom")}
+                    isToggling={isToggling}
                   />
                 ))}
               </div>
@@ -175,12 +237,71 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                         category: template.category,
                         tags: template.tags,
                       })}
+                      isFavorite={isFavorite(template.id, "builtin")}
+                      onToggleFavorite={() => toggleFavorite(template.id, "builtin")}
+                      isToggling={isToggling}
                     />
                   ))}
                 </div>
               </div>
             );
           })}
+        </TabsContent>
+
+        {/* Favorites Tab */}
+        <TabsContent value="favorites" className="mt-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+              Favorite Templates
+            </h3>
+            {favoriteBuiltinTemplates.length > 0 || favoriteCustomTemplates.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {favoriteBuiltinTemplates.map((template) => (
+                  <TemplateCard
+                    key={template.id}
+                    template={template}
+                    onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
+                    onDuplicate={() => setDuplicateTemplate({
+                      prompt: template.prompt,
+                      title: template.title,
+                      description: template.description,
+                      category: template.category,
+                      tags: template.tags,
+                    })}
+                    isFavorite={true}
+                    onToggleFavorite={() => toggleFavorite(template.id, "builtin")}
+                    isToggling={isToggling}
+                  />
+                ))}
+                {favoriteCustomTemplates.map((template) => (
+                  <CustomTemplateCard
+                    key={template.id}
+                    template={template}
+                    onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
+                    onDelete={() => deleteTemplate(template.id)}
+                    isDeleting={isDeleting}
+                    onDuplicate={() => setDuplicateTemplate({
+                      prompt: template.prompt,
+                      title: template.title,
+                      description: template.description,
+                      category: template.category,
+                      tags: template.tags,
+                    })}
+                    isFavorite={true}
+                    onToggleFavorite={() => toggleFavorite(template.id, "custom")}
+                    isToggling={isToggling}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 border rounded-lg border-dashed">
+                <Star className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground mb-2">No favorite templates yet.</p>
+                <p className="text-sm text-muted-foreground">Click the star icon on any template to add it to your favorites.</p>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         {/* Custom Templates Tab */}
@@ -206,6 +327,9 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                       category: template.category,
                       tags: template.tags,
                     })}
+                    isFavorite={isFavorite(template.id, "custom")}
+                    onToggleFavorite={() => toggleFavorite(template.id, "custom")}
+                    isToggling={isToggling}
                   />
                 ))}
               </div>
@@ -241,6 +365,9 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                         category: template.category,
                         tags: template.tags,
                       })}
+                      isFavorite={isFavorite(template.id, "builtin")}
+                      onToggleFavorite={() => toggleFavorite(template.id, "builtin")}
+                      isToggling={isToggling}
                     />
                   ))}
                 </div>
@@ -263,9 +390,12 @@ interface TemplateCardProps {
   template: PromptTemplate;
   onSelect: () => void;
   onDuplicate: () => void;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+  isToggling: boolean;
 }
 
-const TemplateCard = ({ template, onSelect, onDuplicate }: TemplateCardProps) => {
+const TemplateCard = ({ template, onSelect, onDuplicate, isFavorite, onToggleFavorite, isToggling }: TemplateCardProps) => {
   return (
     <Card className="hover:shadow-md transition-shadow cursor-pointer group" onClick={onSelect}>
       <CardHeader className="pb-3">
@@ -274,7 +404,20 @@ const TemplateCard = ({ template, onSelect, onDuplicate }: TemplateCardProps) =>
             {template.title}
           </CardTitle>
           <div className="flex items-center gap-1">
-            <Badge variant="outline" className="ml-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFavorite();
+              }}
+              disabled={isToggling}
+              title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Star className={`h-4 w-4 ${isFavorite ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground"}`} />
+            </Button>
+            <Badge variant="outline" className="ml-1">
               {TEMPLATE_CATEGORIES[template.category].label}
             </Badge>
             <Button
@@ -325,9 +468,12 @@ interface CustomTemplateCardProps {
   onDelete: () => void;
   isDeleting: boolean;
   onDuplicate: () => void;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+  isToggling: boolean;
 }
 
-const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting, onDuplicate }: CustomTemplateCardProps) => {
+const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting, onDuplicate, isFavorite, onToggleFavorite, isToggling }: CustomTemplateCardProps) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   const categoryLabel = template.category === "custom" 
@@ -343,7 +489,20 @@ const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting, onDuplic
               {template.title}
             </CardTitle>
             <div className="flex items-center gap-1">
-              <Badge variant="outline" className="ml-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite();
+                }}
+                disabled={isToggling}
+                title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Star className={`h-4 w-4 ${isFavorite ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground"}`} />
+              </Button>
+              <Badge variant="outline" className="ml-1">
                 {categoryLabel}
               </Badge>
               <Button
