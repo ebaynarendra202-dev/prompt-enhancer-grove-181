@@ -26,16 +26,36 @@ import { TEMPLATE_CATEGORIES, TemplateCategory } from "@/types/templates";
 interface CreateTemplateDialogProps {
   trigger?: React.ReactNode;
   initialPrompt?: string;
+  initialTitle?: string;
+  initialDescription?: string;
+  initialCategory?: string;
+  initialTags?: string[];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
-const CreateTemplateDialog = ({ trigger, initialPrompt = "", onSuccess }: CreateTemplateDialogProps) => {
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+const CreateTemplateDialog = ({ 
+  trigger, 
+  initialPrompt = "", 
+  initialTitle = "",
+  initialDescription = "",
+  initialCategory = "custom",
+  initialTags = [],
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  onSuccess 
+}: CreateTemplateDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? (controlledOnOpenChange || (() => {})) : setInternalOpen;
+
+  const [title, setTitle] = useState(initialTitle);
+  const [description, setDescription] = useState(initialDescription);
   const [prompt, setPrompt] = useState(initialPrompt);
-  const [category, setCategory] = useState<string>("custom");
-  const [tags, setTags] = useState<string[]>([]);
+  const [category, setCategory] = useState<string>(initialCategory);
+  const [tags, setTags] = useState<string[]>(initialTags);
   const [tagInput, setTagInput] = useState("");
 
   const { createTemplate, isCreating } = useCustomTemplates();
@@ -82,31 +102,26 @@ const CreateTemplateDialog = ({ trigger, initialPrompt = "", onSuccess }: Create
   };
 
   const resetForm = () => {
-    setTitle("");
-    setDescription("");
+    setTitle(initialTitle);
+    setDescription(initialDescription);
     setPrompt(initialPrompt);
-    setCategory("custom");
-    setTags([]);
+    setCategory(initialCategory);
+    setTags(initialTags);
     setTagInput("");
   };
 
-  // Update prompt when initialPrompt changes
-  useState(() => {
-    if (initialPrompt) {
-      setPrompt(initialPrompt);
-    }
-  });
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="outline" size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Template
-          </Button>
-        )}
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          {trigger || (
+            <Button variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Template
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Create Custom Template</DialogTitle>

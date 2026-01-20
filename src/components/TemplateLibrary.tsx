@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { promptTemplates, TEMPLATE_CATEGORIES, TemplateCategory, PromptTemplate } from "@/types/templates";
-import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil } from "lucide-react";
+import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy } from "lucide-react";
 import { useCustomTemplates, CustomTemplate } from "@/hooks/useCustomTemplates";
 import CreateTemplateDialog from "./CreateTemplateDialog";
 import EditTemplateDialog from "./EditTemplateDialog";
@@ -37,6 +37,7 @@ const categoryIcons: Record<TemplateCategory | "custom", React.ComponentType<any
 const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | "all" | "custom">("all");
+  const [duplicateTemplate, setDuplicateTemplate] = useState<{ prompt: string; title: string; description?: string; category: string; tags: string[] } | null>(null);
   const { templates: customTemplates, deleteTemplate, isDeleting } = useCustomTemplates();
 
   const filteredTemplates = promptTemplates.filter((template) => {
@@ -92,6 +93,18 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
             </Button>
           }
         />
+        {/* Hidden dialog for duplicating templates */}
+        <CreateTemplateDialog
+          key={duplicateTemplate?.title}
+          initialPrompt={duplicateTemplate?.prompt}
+          initialTitle={duplicateTemplate ? `${duplicateTemplate.title} (Copy)` : undefined}
+          initialDescription={duplicateTemplate?.description}
+          initialCategory={duplicateTemplate?.category}
+          initialTags={duplicateTemplate?.tags}
+          open={!!duplicateTemplate}
+          onOpenChange={(open) => !open && setDuplicateTemplate(null)}
+          onSuccess={() => setDuplicateTemplate(null)}
+        />
       </div>
 
       <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as TemplateCategory | "all" | "custom")}>
@@ -123,6 +136,13 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
                     onDelete={() => deleteTemplate(template.id)}
                     isDeleting={isDeleting}
+                    onDuplicate={() => setDuplicateTemplate({
+                      prompt: template.prompt,
+                      title: template.title,
+                      description: template.description,
+                      category: template.category,
+                      tags: template.tags,
+                    })}
                   />
                 ))}
               </div>
@@ -148,6 +168,13 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                       key={template.id}
                       template={template}
                       onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
+                      onDuplicate={() => setDuplicateTemplate({
+                        prompt: template.prompt,
+                        title: template.title,
+                        description: template.description,
+                        category: template.category,
+                        tags: template.tags,
+                      })}
                     />
                   ))}
                 </div>
@@ -172,6 +199,13 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
                     onDelete={() => deleteTemplate(template.id)}
                     isDeleting={isDeleting}
+                    onDuplicate={() => setDuplicateTemplate({
+                      prompt: template.prompt,
+                      title: template.title,
+                      description: template.description,
+                      category: template.category,
+                      tags: template.tags,
+                    })}
                   />
                 ))}
               </div>
@@ -200,6 +234,13 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                       key={template.id}
                       template={template}
                       onSelect={() => onSelectTemplate(template.prompt, template.id, template.category)}
+                      onDuplicate={() => setDuplicateTemplate({
+                        prompt: template.prompt,
+                        title: template.title,
+                        description: template.description,
+                        category: template.category,
+                        tags: template.tags,
+                      })}
                     />
                   ))}
                 </div>
@@ -221,9 +262,10 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
 interface TemplateCardProps {
   template: PromptTemplate;
   onSelect: () => void;
+  onDuplicate: () => void;
 }
 
-const TemplateCard = ({ template, onSelect }: TemplateCardProps) => {
+const TemplateCard = ({ template, onSelect, onDuplicate }: TemplateCardProps) => {
   return (
     <Card className="hover:shadow-md transition-shadow cursor-pointer group" onClick={onSelect}>
       <CardHeader className="pb-3">
@@ -231,9 +273,23 @@ const TemplateCard = ({ template, onSelect }: TemplateCardProps) => {
           <CardTitle className="text-lg group-hover:text-brand-600 transition-colors">
             {template.title}
           </CardTitle>
-          <Badge variant="outline" className="ml-2">
-            {TEMPLATE_CATEGORIES[template.category].label}
-          </Badge>
+          <div className="flex items-center gap-1">
+            <Badge variant="outline" className="ml-2">
+              {TEMPLATE_CATEGORIES[template.category].label}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDuplicate();
+              }}
+              title="Duplicate as custom template"
+            >
+              <Copy className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          </div>
         </div>
         <CardDescription>{template.description}</CardDescription>
       </CardHeader>
@@ -268,9 +324,10 @@ interface CustomTemplateCardProps {
   onSelect: () => void;
   onDelete: () => void;
   isDeleting: boolean;
+  onDuplicate: () => void;
 }
 
-const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting }: CustomTemplateCardProps) => {
+const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting, onDuplicate }: CustomTemplateCardProps) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   const categoryLabel = template.category === "custom" 
@@ -295,8 +352,21 @@ const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting }: Custom
                 className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={(e) => {
                   e.stopPropagation();
+                  onDuplicate();
+                }}
+                title="Duplicate template"
+              >
+                <Copy className="h-4 w-4 text-muted-foreground" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
                   setEditDialogOpen(true);
                 }}
+                title="Edit template"
               >
                 <Pencil className="h-4 w-4 text-muted-foreground" />
               </Button>
