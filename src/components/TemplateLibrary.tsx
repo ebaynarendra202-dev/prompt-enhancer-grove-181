@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { promptTemplates, TEMPLATE_CATEGORIES, TemplateCategory, PromptTemplate } from "@/types/templates";
-import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy, Star, Download, Upload, Filter } from "lucide-react";
+import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy, Star, Download, Upload, Filter, Eye } from "lucide-react";
 import { exportTemplates, parseTemplateBackupFile } from "@/lib/templateBackup";
+import TemplatePreviewDialog from "./TemplatePreviewDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomTemplates, CustomTemplate } from "@/hooks/useCustomTemplates";
 import { useTemplateFavorites } from "@/hooks/useTemplateFavorites";
@@ -44,6 +45,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | "all" | "custom" | "favorites">("all");
   const [categoryFilter, setCategoryFilter] = useState<TemplateCategory | "all">("all");
   const [duplicateTemplate, setDuplicateTemplate] = useState<{ prompt: string; title: string; description?: string; category: string; tags: string[] } | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<{ id: string; title: string; description?: string | null; prompt: string; category: string; tags: string[]; type: "builtin" | "custom" } | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -242,6 +244,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     isFavorite={true}
                     onToggleFavorite={() => toggleFavorite(template.id, "builtin")}
                     isToggling={isToggling}
+                    onPreview={() => setPreviewTemplate({ ...template, type: "builtin" })}
                   />
                 ))}
                 {favoriteCustomTemplates.map((template) => (
@@ -261,6 +264,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     isFavorite={true}
                     onToggleFavorite={() => toggleFavorite(template.id, "custom")}
                     isToggling={isToggling}
+                    onPreview={() => setPreviewTemplate({ id: template.id, title: template.title, description: template.description, prompt: template.prompt, category: template.category, tags: template.tags, type: "custom" })}
                   />
                 ))}
               </div>
@@ -292,6 +296,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     isFavorite={isFavorite(template.id, "custom")}
                     onToggleFavorite={() => toggleFavorite(template.id, "custom")}
                     isToggling={isToggling}
+                    onPreview={() => setPreviewTemplate({ id: template.id, title: template.title, description: template.description, prompt: template.prompt, category: template.category, tags: template.tags, type: "custom" })}
                   />
                 ))}
               </div>
@@ -327,6 +332,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                       isFavorite={isFavorite(template.id, "builtin")}
                       onToggleFavorite={() => toggleFavorite(template.id, "builtin")}
                       isToggling={isToggling}
+                      onPreview={() => setPreviewTemplate({ ...template, type: "builtin" })}
                     />
                   ))}
                 </div>
@@ -359,6 +365,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     isFavorite={true}
                     onToggleFavorite={() => toggleFavorite(template.id, "builtin")}
                     isToggling={isToggling}
+                    onPreview={() => setPreviewTemplate({ ...template, type: "builtin" })}
                   />
                 ))}
                 {favoriteCustomTemplates.map((template) => (
@@ -378,6 +385,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     isFavorite={true}
                     onToggleFavorite={() => toggleFavorite(template.id, "custom")}
                     isToggling={isToggling}
+                    onPreview={() => setPreviewTemplate({ id: template.id, title: template.title, description: template.description, prompt: template.prompt, category: template.category, tags: template.tags, type: "custom" })}
                   />
                 ))}
               </div>
@@ -446,6 +454,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                     isFavorite={isFavorite(template.id, "custom")}
                     onToggleFavorite={() => toggleFavorite(template.id, "custom")}
                     isToggling={isToggling}
+                    onPreview={() => setPreviewTemplate({ id: template.id, title: template.title, description: template.description, prompt: template.prompt, category: template.category, tags: template.tags, type: "custom" })}
                   />
                 ))}
               </div>
@@ -495,6 +504,7 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
                       isFavorite={isFavorite(template.id, "builtin")}
                       onToggleFavorite={() => toggleFavorite(template.id, "builtin")}
                       isToggling={isToggling}
+                      onPreview={() => setPreviewTemplate({ ...template, type: "builtin" })}
                     />
                   ))}
                 </div>
@@ -509,6 +519,35 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
           <p className="text-muted-foreground">No templates found matching your search.</p>
         </div>
       )}
+
+      <TemplatePreviewDialog
+        open={!!previewTemplate}
+        onOpenChange={(open) => !open && setPreviewTemplate(null)}
+        template={previewTemplate}
+        onUseTemplate={() => {
+          if (previewTemplate) {
+            onSelectTemplate(previewTemplate.prompt, previewTemplate.id, previewTemplate.category);
+          }
+        }}
+        onDuplicate={() => {
+          if (previewTemplate) {
+            setDuplicateTemplate({
+              prompt: previewTemplate.prompt,
+              title: previewTemplate.title,
+              description: previewTemplate.description || undefined,
+              category: previewTemplate.category,
+              tags: previewTemplate.tags,
+            });
+            setPreviewTemplate(null);
+          }
+        }}
+        isFavorite={previewTemplate ? isFavorite(previewTemplate.id, previewTemplate.type) : false}
+        onToggleFavorite={() => {
+          if (previewTemplate) {
+            toggleFavorite(previewTemplate.id, previewTemplate.type);
+          }
+        }}
+      />
     </div>
   );
 };
@@ -520,9 +559,10 @@ interface TemplateCardProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   isToggling: boolean;
+  onPreview: () => void;
 }
 
-const TemplateCard = ({ template, onSelect, onDuplicate, isFavorite, onToggleFavorite, isToggling }: TemplateCardProps) => {
+const TemplateCard = ({ template, onSelect, onDuplicate, isFavorite, onToggleFavorite, isToggling, onPreview }: TemplateCardProps) => {
   return (
     <Card className="hover:shadow-md transition-shadow cursor-pointer group" onClick={onSelect}>
       <CardHeader className="pb-3">
@@ -547,6 +587,18 @@ const TemplateCard = ({ template, onSelect, onDuplicate, isFavorite, onToggleFav
             <Badge variant="outline" className="ml-1">
               {TEMPLATE_CATEGORIES[template.category].label}
             </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => {
+                e.stopPropagation();
+                onPreview();
+              }}
+              title="Preview template"
+            >
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -598,9 +650,10 @@ interface CustomTemplateCardProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   isToggling: boolean;
+  onPreview: () => void;
 }
 
-const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting, onDuplicate, isFavorite, onToggleFavorite, isToggling }: CustomTemplateCardProps) => {
+const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting, onDuplicate, isFavorite, onToggleFavorite, isToggling, onPreview }: CustomTemplateCardProps) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   const categoryLabel = template.category === "custom" 
@@ -632,6 +685,18 @@ const CustomTemplateCard = ({ template, onSelect, onDelete, isDeleting, onDuplic
               <Badge variant="outline" className="ml-1">
                 {categoryLabel}
               </Badge>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPreview();
+                }}
+                title="Preview template"
+              >
+                <Eye className="h-4 w-4 text-muted-foreground" />
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
