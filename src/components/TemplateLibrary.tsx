@@ -4,8 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { promptTemplates, TEMPLATE_CATEGORIES, TemplateCategory, PromptTemplate } from "@/types/templates";
-import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy, Star, Download, Upload } from "lucide-react";
+import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy, Star, Download, Upload, Filter } from "lucide-react";
 import { exportTemplates, parseTemplateBackupFile } from "@/lib/templateBackup";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomTemplates, CustomTemplate } from "@/hooks/useCustomTemplates";
@@ -41,6 +42,7 @@ const categoryIcons: Record<TemplateCategory | "custom" | "favorites", React.Com
 const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | "all" | "custom" | "favorites">("all");
+  const [categoryFilter, setCategoryFilter] = useState<TemplateCategory | "all">("all");
   const [duplicateTemplate, setDuplicateTemplate] = useState<{ prompt: string; title: string; description?: string; category: string; tags: string[] } | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -111,8 +113,11 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
       template.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesCategory = selectedCategory === "all" || selectedCategory === "custom" || template.category === selectedCategory;
+    
+    // Apply category filter when on "all" tab
+    const matchesCategoryFilter = selectedCategory !== "all" || categoryFilter === "all" || template.category === categoryFilter;
 
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesCategory && matchesCategoryFilter;
   });
 
   const filteredCustomTemplates = customTemplates.filter((template) => {
@@ -122,8 +127,11 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
       template.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesCategory = selectedCategory === "all" || selectedCategory === "custom" || template.category === selectedCategory;
+    
+    // Apply category filter when on "all" tab
+    const matchesCategoryFilter = selectedCategory !== "all" || categoryFilter === "all" || template.category === categoryFilter;
 
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesCategory && matchesCategoryFilter;
   });
 
   const getCategoryTemplates = (category: TemplateCategory) => {
@@ -147,12 +155,30 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
-        <Input
-          placeholder="Search templates..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1"
-        />
+        <div className="flex flex-1 gap-2">
+          <Input
+            placeholder="Search templates..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1"
+          />
+          {selectedCategory === "all" && (
+            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as TemplateCategory | "all")}>
+              <SelectTrigger className="w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {Object.entries(TEMPLATE_CATEGORIES).map(([key, { label }]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
         <CreateTemplateDialog
           trigger={
             <Button className="bg-brand-600 hover:bg-brand-700">
