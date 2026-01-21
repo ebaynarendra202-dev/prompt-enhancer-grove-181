@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { promptTemplates, TEMPLATE_CATEGORIES, TemplateCategory, PromptTemplate } from "@/types/templates";
-import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy, Star } from "lucide-react";
+import { Code, Image, FileText, Search, Briefcase, Sparkles, User, Trash2, Plus, Pencil, Copy, Star, Download, Upload } from "lucide-react";
+import { exportTemplates, parseTemplateBackupFile } from "@/lib/templateBackup";
+import { useToast } from "@/hooks/use-toast";
 import { useCustomTemplates, CustomTemplate } from "@/hooks/useCustomTemplates";
 import { useTemplateFavorites } from "@/hooks/useTemplateFavorites";
 import CreateTemplateDialog from "./CreateTemplateDialog";
@@ -40,8 +42,67 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | "all" | "custom" | "favorites">("all");
   const [duplicateTemplate, setDuplicateTemplate] = useState<{ prompt: string; title: string; description?: string; category: string; tags: string[] } | null>(null);
-  const { templates: customTemplates, deleteTemplate, isDeleting } = useCustomTemplates();
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const { templates: customTemplates, deleteTemplate, isDeleting, createTemplate, isCreating } = useCustomTemplates();
   const { favorites, isFavorite, toggleFavorite, isToggling } = useTemplateFavorites();
+
+  const handleExportTemplates = () => {
+    if (customTemplates.length === 0) {
+      toast({
+        title: "No templates to export",
+        description: "Create some custom templates first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    exportTemplates(customTemplates);
+    toast({
+      title: "Templates exported!",
+      description: `${customTemplates.length} template(s) saved to file.`,
+    });
+  };
+
+  const handleImportTemplates = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    try {
+      const backupData = await parseTemplateBackupFile(file);
+      
+      // Import each template
+      let importedCount = 0;
+      for (const template of backupData.templates) {
+        createTemplate({
+          title: template.title,
+          description: template.description || undefined,
+          prompt: template.prompt,
+          category: template.category,
+          tags: template.tags,
+        });
+        importedCount++;
+      }
+
+      toast({
+        title: "Templates imported!",
+        description: `${importedCount} template(s) imported successfully.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Import failed",
+        description: error instanceof Error ? error.message : "Failed to import templates.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
 
   const filteredTemplates = promptTemplates.filter((template) => {
     const matchesSearch =
@@ -307,10 +368,39 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
         {/* Custom Templates Tab */}
         <TabsContent value="custom" className="mt-6">
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <User className="h-5 w-5 text-brand-600" />
-              My Templates
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <User className="h-5 w-5 text-brand-600" />
+                My Templates
+              </h3>
+              <div className="flex gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleImportTemplates}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isImporting || isCreating}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportTemplates}
+                  disabled={customTemplates.length === 0}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
+            </div>
             {filteredCustomTemplates.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredCustomTemplates.map((template) => (
@@ -337,7 +427,18 @@ const TemplateLibrary = ({ onSelectTemplate }: TemplateLibraryProps) => {
               <div className="text-center py-12 border rounded-lg border-dashed">
                 <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground mb-4">You haven't created any templates yet.</p>
-                <CreateTemplateDialog />
+                <div className="flex flex-col items-center gap-2">
+                  <CreateTemplateDialog />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isImporting}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Or import from file
+                  </Button>
+                </div>
               </div>
             )}
           </div>
