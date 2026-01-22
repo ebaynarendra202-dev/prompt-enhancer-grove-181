@@ -18,6 +18,10 @@ import { usePromptVersions, PromptVersion } from "@/hooks/usePromptVersions";
 import PromptQualityScore from "./PromptQualityScore";
 import PromptDiffView from "./PromptDiffView";
 import PromptVersionHistory from "./PromptVersionHistory";
+import { promptTemplates } from "@/types/templates";
+import { useCustomTemplates } from "@/hooks/useCustomTemplates";
+import TemplateRecommendations, { TemplateSuggestion, TemplateSuggestionTemplate } from "@/components/TemplateRecommendations";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PromptImproverProps {
   initialPrompt?: string;
@@ -81,6 +85,10 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [showComparison, setShowComparison] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
   const [history, setHistory] = useState<PromptHistory[]>([]);
+  const { templates: customTemplates } = useCustomTemplates();
+  const [templateSuggestions, setTemplateSuggestions] = useState<TemplateSuggestion[]>([]);
+  const [isSuggestingTemplates, setIsSuggestingTemplates] = useState(false);
+  const lastTemplateSuggestErrorRef = useRef<string>("");
   const { toast } = useToast();
   const { favorites, addFavorite, removeFavorite, isAdding } = useFavorites();
   const { versionGroups, addVersion, deleteGroup, deleteVersion, clearAllVersions } = usePromptVersions();
@@ -149,6 +157,98 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       setImprovedPrompt(""); // Clear previous improved prompt
     }
   }, [initialPrompt]);
+
+  // Suggest templates as the user types (debounced)
+  useEffect(() => {
+    const draft = prompt.trim();
+    if (draft.length < 20) {
+      setTemplateSuggestions([]);
+      setIsSuggestingTemplates(false);
+      return;
+    }
+
+    const timer = window.setTimeout(async () => {
+      try {
+        setIsSuggestingTemplates(true);
+
+        const allTemplates: TemplateSuggestionTemplate[] = [
+          ...promptTemplates.map((t) => ({
+            id: t.id,
+            title: t.title,
+            description: t.description,
+            prompt: t.prompt,
+            category: t.category,
+            tags: t.tags,
+            source: "built_in" as const,
+          })),
+          ...customTemplates.map((t) => ({
+            id: t.id,
+            title: t.title,
+            description: t.description,
+            prompt: t.prompt,
+            category: t.category,
+            tags: t.tags,
+            source: "custom" as const,
+          })),
+        ];
+
+        const { data, error } = await supabase.functions.invoke("recommend-templates", {
+          body: { prompt: draft, templates: allTemplates },
+        });
+
+        if (error) throw error;
+        const recs = (data?.recommendations ?? []) as TemplateSuggestion[];
+        setTemplateSuggestions(recs);
+      } catch (e: any) {
+        const message = e?.message || "Failed to recommend templates";
+        // Avoid spamming toasts on every keystroke.
+        if (lastTemplateSuggestErrorRef.current !== message) {
+          lastTemplateSuggestErrorRef.current = message;
+          toast({
+            title: "Template suggestions unavailable",
+            description: message,
+            variant: "destructive",
+          });
+        }
+        setTemplateSuggestions([]);
+      } finally {
+        setIsSuggestingTemplates(false);
+      }
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [prompt, customTemplates, toast]);
+
+  const suggestedTemplates = (() => {
+    const templateById = new Map<string, TemplateSuggestionTemplate>();
+
+    promptTemplates.forEach((t) =>
+      templateById.set(t.id, {
+        id: t.id,
+        title: t.title,
+        description: t.description,
+        prompt: t.prompt,
+        category: t.category,
+        tags: t.tags,
+        source: "built_in",
+      }),
+    );
+    customTemplates.forEach((t) =>
+      templateById.set(t.id, {
+        id: t.id,
+        title: t.title,
+        description: t.description,
+        prompt: t.prompt,
+        category: t.category,
+        tags: t.tags,
+        source: "custom",
+      }),
+    );
+
+    return templateSuggestions
+      .map((s) => ({ ...s, template: templateById.get(s.templateId) }))
+      .filter((s) => !!s.template);
+  })();
 
   const toggleEnhancement = (enhancementId: string) => {
     setSelectedEnhancements(prev => 
@@ -593,6 +693,18 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
             )}
           </div>
         </div>
+
+        <TemplateRecommendations
+          isLoading={isSuggestingTemplates}
+          suggestions={suggestedTemplates}
+          onUseTemplate={(t) => {
+            setPrompt(t.prompt);
+            setImprovedPrompt("");
+            setShowComparison(false);
+            setShowDiff(false);
+            toast({ title: "Template applied", description: `Loaded “${t.title}”.` });
+          }}
+        />
 
         <PromptQualityScore prompt={prompt} />
 
