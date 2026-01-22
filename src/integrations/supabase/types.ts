@@ -141,7 +141,10 @@ export type Database = {
           id: string
           improved_prompt: string
           original_prompt: string
+          quality_score: number | null
           user_id: string | null
+          was_copied: boolean | null
+          was_favorited: boolean | null
         }
         Insert: {
           ai_model: string
@@ -149,7 +152,10 @@ export type Database = {
           id?: string
           improved_prompt: string
           original_prompt: string
+          quality_score?: number | null
           user_id?: string | null
+          was_copied?: boolean | null
+          was_favorited?: boolean | null
         }
         Update: {
           ai_model?: string
@@ -157,7 +163,10 @@ export type Database = {
           id?: string
           improved_prompt?: string
           original_prompt?: string
+          quality_score?: number | null
           user_id?: string | null
+          was_copied?: boolean | null
+          was_favorited?: boolean | null
         }
         Relationships: []
       }
