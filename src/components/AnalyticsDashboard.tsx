@@ -4,6 +4,8 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { promptTemplates, TEMPLATE_CATEGORIES } from "@/types/templates";
 import { BarChart3, TrendingUp, Sparkles, Award, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+import AnalyticsTrendsSection from "./analytics/AnalyticsTrendsSection";
 
 const AnalyticsDashboard = () => {
   const { data: analytics, isLoading } = useAnalytics();
@@ -217,6 +219,21 @@ const AnalyticsDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Trends Section */}
+      <Separator className="my-8" />
+      
+      <div className="text-center space-y-2 mb-6">
+        <h3 className="text-2xl font-bold flex items-center justify-center gap-2">
+          <TrendingUp className="h-6 w-6 text-primary" />
+          Usage Trends
+        </h3>
+        <p className="text-muted-foreground">
+          Explore your activity patterns over time
+        </p>
+      </div>
+
+      <AnalyticsTrendsSection />
     </div>
   );
 };
