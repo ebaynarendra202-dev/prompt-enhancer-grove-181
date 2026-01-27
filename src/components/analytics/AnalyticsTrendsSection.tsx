@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 const AnalyticsTrendsSection = () => {
   const [dateRange, setDateRange] = useState<DateRange>("30d");
   const [granularity, setGranularity] = useState<Granularity>("daily");
+  const [compareMode, setCompareMode] = useState(false);
 
   const { data: trends, isLoading } = useAnalyticsTrends(dateRange, granularity);
 
@@ -18,7 +19,7 @@ const AnalyticsTrendsSection = () => {
     return (
       <div className="space-y-6">
         <div className="flex justify-center">
-          <Skeleton className="h-10 w-[300px]" />
+          <Skeleton className="h-10 w-[400px]" />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map((i) => (
@@ -46,19 +47,31 @@ const AnalyticsTrendsSection = () => {
         granularity={granularity}
         onDateRangeChange={setDateRange}
         onGranularityChange={setGranularity}
+        compareMode={compareMode}
+        onCompareModeChange={setCompareMode}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PromptTrendChart data={trends.promptTrends} granularity={granularity} />
+        <PromptTrendChart 
+          data={trends.promptTrends} 
+          previousData={trends.previousPromptTrends}
+          comparison={trends.totalPromptsComparison}
+          granularity={granularity}
+          compareMode={compareMode}
+        />
         <ModelTrendChart 
           data={trends.modelTrends} 
           models={trends.allModels} 
-          granularity={granularity} 
+          granularity={granularity}
+          compareMode={compareMode}
+          modelComparisons={trends.modelComparisons}
         />
         <CategoryTrendChart 
           data={trends.categoryTrends} 
           categories={trends.allCategories} 
-          granularity={granularity} 
+          granularity={granularity}
+          compareMode={compareMode}
+          categoryComparisons={trends.categoryComparisons}
         />
         <TemplateTrendChart 
           data={trends.templateTrends} 
