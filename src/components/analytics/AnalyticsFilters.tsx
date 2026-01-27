@@ -1,12 +1,16 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { DateRange, Granularity } from "@/hooks/useAnalyticsTrends";
-import { Calendar, BarChart3 } from "lucide-react";
+import { Calendar, BarChart3, GitCompare } from "lucide-react";
 
 interface AnalyticsFiltersProps {
   dateRange: DateRange;
   granularity: Granularity;
   onDateRangeChange: (value: DateRange) => void;
   onGranularityChange: (value: Granularity) => void;
+  compareMode?: boolean;
+  onCompareModeChange?: (enabled: boolean) => void;
 }
 
 const DATE_RANGE_OPTIONS: { value: DateRange; label: string }[] = [
@@ -28,6 +32,8 @@ const AnalyticsFilters = ({
   granularity,
   onDateRangeChange,
   onGranularityChange,
+  compareMode = false,
+  onCompareModeChange,
 }: AnalyticsFiltersProps) => {
   return (
     <div className="flex flex-wrap gap-4 items-center justify-center">
@@ -62,6 +68,20 @@ const AnalyticsFilters = ({
           </SelectContent>
         </Select>
       </div>
+
+      {onCompareModeChange && (
+        <div className="flex items-center gap-2 pl-2 border-l border-border">
+          <GitCompare className="h-4 w-4 text-muted-foreground" />
+          <Switch
+            id="compare-mode"
+            checked={compareMode}
+            onCheckedChange={onCompareModeChange}
+          />
+          <Label htmlFor="compare-mode" className="text-sm cursor-pointer">
+            Compare periods
+          </Label>
+        </div>
+      )}
     </div>
   );
 };
