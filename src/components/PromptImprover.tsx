@@ -16,6 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useFavorites } from "@/hooks/useFavorites";
 import { usePromptVersions, PromptVersion } from "@/hooks/usePromptVersions";
 import PromptQualityScore from "./PromptQualityScore";
+import PromptCoach from "./PromptCoach";
 import PromptDiffView from "./PromptDiffView";
 import PromptVersionHistory from "./PromptVersionHistory";
 import { promptTemplates } from "@/types/templates";
@@ -707,6 +708,8 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
         />
 
         <PromptQualityScore prompt={prompt} />
+
+        <PromptCoach prompt={prompt} />
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
