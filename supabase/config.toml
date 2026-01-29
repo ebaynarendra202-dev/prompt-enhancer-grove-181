@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.coach-prompt]
 verify_jwt = false
+
+[functions.apply-coaching-tip]
+verify_jwt = false

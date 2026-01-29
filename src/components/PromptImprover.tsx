@@ -709,7 +709,13 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
 
         <PromptQualityScore prompt={prompt} />
 
-        <PromptCoach prompt={prompt} />
+        <PromptCoach 
+          prompt={prompt} 
+          onApplyTip={(newPrompt) => {
+            setPrompt(newPrompt);
+            setImprovedPrompt("");
+          }}
+        />
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">

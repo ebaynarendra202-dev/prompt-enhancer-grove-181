@@ -9,11 +9,14 @@ import {
   BookOpen,
   Loader2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Wand2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CoachingTip {
   type: "clarity" | "specificity" | "context" | "structure" | "constraint" | "example";
@@ -24,6 +27,7 @@ interface CoachingTip {
 
 interface PromptCoachProps {
   prompt: string;
+  onApplyTip?: (newPrompt: string) => void;
 }
 
 const typeConfig = {
@@ -71,11 +75,13 @@ const priorityColors = {
   low: "border-muted-foreground/30 bg-muted/30",
 };
 
-const PromptCoach = ({ prompt }: PromptCoachProps) => {
+const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
   const [tips, setTips] = useState<CoachingTip[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
   const [lastAnalyzedPrompt, setLastAnalyzedPrompt] = useState("");
+  const [applyingTipIndex, setApplyingTipIndex] = useState<number | null>(null);
+  const { toast } = useToast();
 
   const analyzePrompt = useCallback(async (text: string) => {
     if (text.trim().length < 15) {
@@ -109,6 +115,40 @@ const PromptCoach = ({ prompt }: PromptCoachProps) => {
       setIsLoading(false);
     }
   }, [lastAnalyzedPrompt]);
+
+  const applyTip = async (tip: CoachingTip, index: number) => {
+    if (!onApplyTip) return;
+    
+    setApplyingTipIndex(index);
+    try {
+      const { data, error } = await supabase.functions.invoke('apply-coaching-tip', {
+        body: { prompt: prompt.trim(), tip }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to apply tip');
+      }
+
+      if (data?.improvedPrompt) {
+        onApplyTip(data.improvedPrompt);
+        // Remove the applied tip from the list
+        setTips(prev => prev.filter((_, i) => i !== index));
+        toast({
+          title: "Tip applied!",
+          description: `Your prompt has been improved for ${typeConfig[tip.type].label.toLowerCase()}.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error applying tip:', error);
+      toast({
+        title: "Failed to apply tip",
+        description: error instanceof Error ? error.message : "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setApplyingTipIndex(null);
+    }
+  };
 
   // Debounced analysis
   useEffect(() => {
@@ -167,6 +207,7 @@ const PromptCoach = ({ prompt }: PromptCoachProps) => {
             {tips.map((tip, index) => {
               const config = typeConfig[tip.type];
               const Icon = config.icon;
+              const isApplying = applyingTipIndex === index;
               
               return (
                 <div
@@ -182,14 +223,40 @@ const PromptCoach = ({ prompt }: PromptCoachProps) => {
                       <Icon className={cn("h-3.5 w-3.5", config.color)} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={cn("text-xs font-medium", config.color)}>
-                          {config.label}
-                        </span>
-                        {tip.priority === 'high' && (
-                          <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
-                            Important
-                          </Badge>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <div className="flex items-center gap-2">
+                          <span className={cn("text-xs font-medium", config.color)}>
+                            {config.label}
+                          </span>
+                          {tip.priority === 'high' && (
+                            <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+                              Important
+                            </Badge>
+                          )}
+                        </div>
+                        {onApplyTip && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs gap-1 hover:bg-primary/10 hover:text-primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              applyTip(tip, index);
+                            }}
+                            disabled={isApplying || applyingTipIndex !== null}
+                          >
+                            {isApplying ? (
+                              <>
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                                Applying...
+                              </>
+                            ) : (
+                              <>
+                                <Wand2 className="h-3 w-3" />
+                                Apply
+                              </>
+                            )}
+                          </Button>
                         )}
                       </div>
                       <p className="text-sm font-medium text-foreground mb-0.5">
