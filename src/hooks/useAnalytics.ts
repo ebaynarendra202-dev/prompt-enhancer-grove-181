@@ -8,6 +8,12 @@ export interface AnalyticsSummary {
   categoryUsage: { category: string; count: number }[];
   popularTemplates: { template_id: string; count: number }[];
   recentActivity: { date: string; count: number }[];
+  coachingTipStats: {
+    totalApplied: number;
+    totalIgnored: number;
+    byType: { type: string; applied: number; ignored: number }[];
+    byPriority: { priority: string; applied: number; ignored: number }[];
+  };
 }
 
 export const useAnalytics = () => {
@@ -86,6 +92,50 @@ export const useAnalytics = () => {
         .map(([date, count]) => ({ date, count }))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+      // Get coaching tip interaction stats
+      const { data: tipData } = await supabase
+        .from("coaching_tip_interactions")
+        .select("tip_type, tip_priority, action");
+
+      const tipInteractions = tipData || [];
+      
+      const appliedActions = ['applied', 'applied_all'];
+      const totalApplied = tipInteractions.filter(t => appliedActions.includes(t.action)).length;
+      const totalIgnored = tipInteractions.filter(t => t.action === 'ignored').length;
+
+      // Group by type
+      const typeStats = tipInteractions.reduce((acc, { tip_type, action }) => {
+        if (!acc[tip_type]) acc[tip_type] = { applied: 0, ignored: 0 };
+        if (appliedActions.includes(action)) {
+          acc[tip_type].applied++;
+        } else if (action === 'ignored') {
+          acc[tip_type].ignored++;
+        }
+        return acc;
+      }, {} as Record<string, { applied: number; ignored: number }>);
+
+      const byType = Object.entries(typeStats)
+        .map(([type, stats]) => ({ type, ...stats }))
+        .sort((a, b) => (b.applied + b.ignored) - (a.applied + a.ignored));
+
+      // Group by priority
+      const priorityStats = tipInteractions.reduce((acc, { tip_priority, action }) => {
+        if (!acc[tip_priority]) acc[tip_priority] = { applied: 0, ignored: 0 };
+        if (appliedActions.includes(action)) {
+          acc[tip_priority].applied++;
+        } else if (action === 'ignored') {
+          acc[tip_priority].ignored++;
+        }
+        return acc;
+      }, {} as Record<string, { applied: number; ignored: number }>);
+
+      const byPriority = Object.entries(priorityStats)
+        .map(([priority, stats]) => ({ priority, ...stats }))
+        .sort((a, b) => {
+          const order = { high: 0, medium: 1, low: 2 };
+          return (order[a.priority as keyof typeof order] || 3) - (order[b.priority as keyof typeof order] || 3);
+        });
+
       return {
         totalPrompts: totalPrompts || 0,
         totalTemplateUses: totalTemplateUses || 0,
@@ -93,6 +143,12 @@ export const useAnalytics = () => {
         categoryUsage,
         popularTemplates,
         recentActivity,
+        coachingTipStats: {
+          totalApplied,
+          totalIgnored,
+          byType,
+          byPriority,
+        },
       };
     },
     refetchInterval: 30000, // Refetch every 30 seconds
