@@ -81,6 +81,7 @@ const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
   const [isOpen, setIsOpen] = useState(true);
   const [lastAnalyzedPrompt, setLastAnalyzedPrompt] = useState("");
   const [applyingTipIndex, setApplyingTipIndex] = useState<number | null>(null);
+  const [isApplyingAll, setIsApplyingAll] = useState(false);
   const { toast } = useToast();
 
   const analyzePrompt = useCallback(async (text: string) => {
@@ -115,6 +116,39 @@ const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
       setIsLoading(false);
     }
   }, [lastAnalyzedPrompt]);
+
+  const applyAllTips = async () => {
+    if (!onApplyTip || tips.length === 0) return;
+    
+    setIsApplyingAll(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('apply-all-coaching-tips', {
+        body: { prompt: prompt.trim(), tips }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to apply tips');
+      }
+
+      if (data?.improvedPrompt) {
+        onApplyTip(data.improvedPrompt);
+        setTips([]);
+        toast({
+          title: "All tips applied!",
+          description: `Your prompt has been improved with ${tips.length} suggestions.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error applying all tips:', error);
+      toast({
+        title: "Failed to apply tips",
+        description: error instanceof Error ? error.message : "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setIsApplyingAll(false);
+    }
+  };
 
   const applyTip = async (tip: CoachingTip, index: number) => {
     if (!onApplyTip) return;
@@ -188,11 +222,37 @@ const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
                 </Badge>
               )}
             </div>
-            {isOpen ? (
-              <ChevronUp className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            )}
+            <div className="flex items-center gap-2">
+              {onApplyTip && tips.length > 1 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 px-2 text-xs gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    applyAllTips();
+                  }}
+                  disabled={isApplyingAll || applyingTipIndex !== null}
+                >
+                  {isApplyingAll ? (
+                    <>
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Applying...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-3 w-3" />
+                      Apply All
+                    </>
+                  )}
+                </Button>
+              )}
+              {isOpen ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              )}
+            </div>
           </div>
         </CollapsibleTrigger>
 
@@ -243,7 +303,7 @@ const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
                               e.stopPropagation();
                               applyTip(tip, index);
                             }}
-                            disabled={isApplying || applyingTipIndex !== null}
+                            disabled={isApplying || applyingTipIndex !== null || isApplyingAll}
                           >
                             {isApplying ? (
                               <>
