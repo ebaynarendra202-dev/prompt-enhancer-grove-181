@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Lightbulb, 
@@ -17,6 +17,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { trackTipApplied, trackAllTipsApplied, trackTipsIgnored } from "@/hooks/useCoachingAnalytics";
 
 interface CoachingTip {
   type: "clarity" | "specificity" | "context" | "structure" | "constraint" | "example";
@@ -82,8 +83,8 @@ const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
   const [lastAnalyzedPrompt, setLastAnalyzedPrompt] = useState("");
   const [applyingTipIndex, setApplyingTipIndex] = useState<number | null>(null);
   const [isApplyingAll, setIsApplyingAll] = useState(false);
+  const previousTipsRef = useRef<CoachingTip[]>([]);
   const { toast } = useToast();
-
   const analyzePrompt = useCallback(async (text: string) => {
     if (text.trim().length < 15) {
       setTips([]);
@@ -131,8 +132,12 @@ const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
       }
 
       if (data?.improvedPrompt) {
+        // Track all tips as applied
+        trackAllTipsApplied(tips, prompt.length).catch(console.error);
+        
         onApplyTip(data.improvedPrompt);
         setTips([]);
+        previousTipsRef.current = [];
         toast({
           title: "All tips applied!",
           description: `Your prompt has been improved with ${tips.length} suggestions.`,
@@ -164,9 +169,16 @@ const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
       }
 
       if (data?.improvedPrompt) {
+        // Track tip as applied
+        trackTipApplied(tip, prompt.length).catch(console.error);
+        
         onApplyTip(data.improvedPrompt);
-        // Remove the applied tip from the list
-        setTips(prev => prev.filter((_, i) => i !== index));
+        // Remove the applied tip from the list and update ref
+        setTips(prev => {
+          const newTips = prev.filter((_, i) => i !== index);
+          previousTipsRef.current = newTips;
+          return newTips;
+        });
         toast({
           title: "Tip applied!",
           description: `Your prompt has been improved for ${typeConfig[tip.type].label.toLowerCase()}.`,
@@ -183,6 +195,19 @@ const PromptCoach = ({ prompt, onApplyTip }: PromptCoachProps) => {
       setApplyingTipIndex(null);
     }
   };
+
+  // Track ignored tips when new tips replace old ones without being applied
+  useEffect(() => {
+    if (previousTipsRef.current.length > 0 && tips.length > 0) {
+      // Check if tips changed (new analysis happened)
+      const tipsChanged = JSON.stringify(previousTipsRef.current) !== JSON.stringify(tips);
+      if (tipsChanged) {
+        // Previous tips were ignored (user moved on without applying)
+        trackTipsIgnored(previousTipsRef.current, prompt.length).catch(console.error);
+      }
+    }
+    previousTipsRef.current = tips;
+  }, [tips, prompt.length]);
 
   // Debounced analysis
   useEffect(() => {

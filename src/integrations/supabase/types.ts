@@ -38,6 +38,42 @@ export type Database = {
         }
         Relationships: []
       }
+      coaching_tip_interactions: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          prompt_length: number | null
+          tip_issue: string | null
+          tip_priority: string
+          tip_suggestion: string | null
+          tip_type: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          prompt_length?: number | null
+          tip_issue?: string | null
+          tip_priority: string
+          tip_suggestion?: string | null
+          tip_type: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          prompt_length?: number | null
+          tip_issue?: string | null
+          tip_priority?: string
+          tip_suggestion?: string | null
+          tip_type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       custom_templates: {
         Row: {
           category: string
