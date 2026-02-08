@@ -2,10 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { promptTemplates, TEMPLATE_CATEGORIES } from "@/types/templates";
-import { BarChart3, TrendingUp, Sparkles, Award, Calendar } from "lucide-react";
+import { BarChart3, TrendingUp, Sparkles, Award, Calendar, Lightbulb } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import AnalyticsTrendsSection from "./analytics/AnalyticsTrendsSection";
+import CoachingTipAnalytics from "./analytics/CoachingTipAnalytics";
 
 const AnalyticsDashboard = () => {
   const { data: analytics, isLoading } = useAnalytics();
@@ -219,6 +220,21 @@ const AnalyticsDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Coaching Tips Section */}
+      <Separator className="my-8" />
+      
+      <div className="text-center space-y-2 mb-6">
+        <h3 className="text-2xl font-bold flex items-center justify-center gap-2">
+          <Lightbulb className="h-6 w-6 text-amber-500" />
+          Coaching Insights
+        </h3>
+        <p className="text-muted-foreground">
+          See which coaching tips are most helpful
+        </p>
+      </div>
+
+      <CoachingTipAnalytics stats={analytics.coachingTipStats} />
 
       {/* Trends Section */}
       <Separator className="my-8" />
