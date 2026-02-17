@@ -1,9 +1,51 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+async function getTipTypePreferences(): Promise<string> {
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data, error } = await supabase
+      .from('coaching_tip_interactions')
+      .select('tip_type, action');
+
+    if (error || !data || data.length === 0) return '';
+
+    const stats: Record<string, { applied: number; ignored: number }> = {};
+    for (const row of data) {
+      if (!stats[row.tip_type]) stats[row.tip_type] = { applied: 0, ignored: 0 };
+      if (row.action === 'applied' || row.action === 'applied_all') {
+        stats[row.tip_type].applied++;
+      } else if (row.action === 'ignored') {
+        stats[row.tip_type].ignored++;
+      }
+    }
+
+    const ranked = Object.entries(stats)
+      .map(([type, s]) => {
+        const total = s.applied + s.ignored;
+        const rate = total > 0 ? Math.round((s.applied / total) * 100) : 50;
+        return { type, rate, total };
+      })
+      .filter(t => t.total >= 3)
+      .sort((a, b) => b.rate - a.rate);
+
+    if (ranked.length === 0) return '';
+
+    const lines = ranked.map(r => `- ${r.type}: ${r.rate}% apply rate (${r.total} interactions)`).join('\n');
+    return `\n\nUser preference data (prioritize tip types with higher apply rates):\n${lines}`;
+  } catch (e) {
+    console.error('Failed to fetch tip preferences:', e);
+    return '';
+  }
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -27,6 +69,8 @@ serve(async (req) => {
     }
 
     console.log('Coaching prompt:', prompt.substring(0, 100) + '...');
+
+    const tipPreferences = await getTipTypePreferences();
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -66,7 +110,7 @@ Guidelines:
 - Be specific - reference actual parts of the prompt
 - Prioritize high-impact issues
 - If the prompt is already good, return fewer tips or empty array
-- Return ONLY valid JSON, no markdown`
+- Return ONLY valid JSON, no markdown${tipPreferences}`
           },
           {
             role: 'user',
