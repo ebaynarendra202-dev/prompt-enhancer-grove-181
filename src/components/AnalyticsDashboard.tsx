@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import AnalyticsTrendsSection from "./analytics/AnalyticsTrendsSection";
 import CoachingTipAnalytics from "./analytics/CoachingTipAnalytics";
+import MostAppliedTipsLeaderboard from "./analytics/MostAppliedTipsLeaderboard";
 
 const AnalyticsDashboard = () => {
   const { data: analytics, isLoading } = useAnalytics();
@@ -235,6 +236,8 @@ const AnalyticsDashboard = () => {
       </div>
 
       <CoachingTipAnalytics stats={analytics.coachingTipStats} />
+
+      <MostAppliedTipsLeaderboard byType={analytics.coachingTipStats.byType} />
 
       {/* Trends Section */}
       <Separator className="my-8" />
