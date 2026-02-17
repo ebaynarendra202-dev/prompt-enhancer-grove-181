@@ -31,14 +31,24 @@ export interface PeriodComparison {
   percentageChange: number;
 }
 
+export interface CoachingTrendDataPoint {
+  date: string;
+  applied: number;
+  ignored: number;
+  [tipType: string]: string | number;
+}
+
 export interface AnalyticsTrends {
   promptTrends: TrendDataPoint[];
   modelTrends: ModelTrendDataPoint[];
   categoryTrends: CategoryTrendDataPoint[];
   templateTrends: TemplateTrendDataPoint[];
+  coachingTrends: TrendDataPoint[];
+  coachingByTypeTrends: CoachingTrendDataPoint[];
   allModels: string[];
   allCategories: string[];
   allTemplates: string[];
+  allTipTypes: string[];
   // Comparison data
   previousPromptTrends: TrendDataPoint[];
   previousModelTrends: ModelTrendDataPoint[];
@@ -136,6 +146,12 @@ export const useAnalyticsTrends = (dateRange: DateRange, granularity: Granularit
         .gte("created_at", prevStartDate.toISOString())
         .lte("created_at", prevEndDate.toISOString());
 
+      // Fetch coaching tip interactions
+      const { data: coachingData } = await supabase
+        .from("coaching_tip_interactions")
+        .select("created_at, tip_type, action")
+        .gte("created_at", startDate.toISOString());
+
       // Process current period prompt trends
       const promptCounts: Record<string, number> = {};
       const modelCounts: Record<string, Record<string, number>> = {};
@@ -205,9 +221,25 @@ export const useAnalyticsTrends = (dateRange: DateRange, granularity: Granularit
         allTemplatesSet.add(template_id);
       });
 
+      // Process coaching tip interactions
+      const coachingCounts: Record<string, number> = {};
+      const coachingByType: Record<string, Record<string, number>> = {};
+      const allTipTypesSet = new Set<string>();
+
+      const appliedActions = ['applied', 'applied_all'];
+      (coachingData || []).forEach(({ created_at, tip_type, action }) => {
+        if (!appliedActions.includes(action) && action !== 'ignored') return;
+        const bucket = formatDateByGranularity(new Date(created_at), granularity);
+        coachingCounts[bucket] = (coachingCounts[bucket] || 0) + 1;
+        if (!coachingByType[bucket]) coachingByType[bucket] = {};
+        coachingByType[bucket][tip_type] = (coachingByType[bucket][tip_type] || 0) + 1;
+        allTipTypesSet.add(tip_type);
+      });
+
       const allModels = Array.from(allModelsSet);
       const allCategories = Array.from(allCategoriesSet);
       const allTemplates = Array.from(allTemplatesSet);
+      const allTipTypes = Array.from(allTipTypesSet);
 
       // Build current trend arrays
       const promptTrends: TrendDataPoint[] = dateBuckets.map(date => ({
@@ -301,14 +333,31 @@ export const useAnalyticsTrends = (dateRange: DateRange, granularity: Granularit
         };
       });
 
+      // Build coaching trend arrays
+      const coachingTrends: TrendDataPoint[] = dateBuckets.map(date => ({
+        date,
+        count: coachingCounts[date] || 0,
+      }));
+
+      const coachingByTypeTrends: CoachingTrendDataPoint[] = dateBuckets.map(date => {
+        const point: CoachingTrendDataPoint = { date, applied: 0, ignored: 0 };
+        allTipTypes.forEach(type => {
+          point[type] = coachingByType[date]?.[type] || 0;
+        });
+        return point;
+      });
+
       return {
         promptTrends,
         modelTrends,
         categoryTrends,
         templateTrends,
+        coachingTrends,
+        coachingByTypeTrends,
         allModels,
         allCategories,
         allTemplates,
+        allTipTypes,
         previousPromptTrends,
         previousModelTrends,
         previousCategoryTrends,

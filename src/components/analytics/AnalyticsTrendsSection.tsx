@@ -5,6 +5,7 @@ import PromptTrendChart from "./PromptTrendChart";
 import ModelTrendChart from "./ModelTrendChart";
 import CategoryTrendChart from "./CategoryTrendChart";
 import TemplateTrendChart from "./TemplateTrendChart";
+import CoachingTipTrendChart from "./CoachingTipTrendChart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
@@ -77,6 +78,12 @@ const AnalyticsTrendsSection = () => {
           data={trends.templateTrends} 
           templates={trends.allTemplates} 
           granularity={granularity} 
+        />
+        <CoachingTipTrendChart
+          overviewData={trends.coachingTrends}
+          byTypeData={trends.coachingByTypeTrends}
+          tipTypes={trends.allTipTypes}
+          granularity={granularity}
         />
       </div>
     </div>
