@@ -1,145 +1,106 @@
-# AI Prompt Improver
+# 🧠 AI Prompt Improver
 
-A modern web application that helps you enhance your AI prompts with intelligent suggestions and improvements tailored to different AI models.
+A powerful web application that helps you craft better AI prompts through intelligent analysis, real-time coaching, and data-driven recommendations.
 
-## 🌟 Features
+## ✨ Features
 
-### Core Functionality
-- **Prompt Enhancement**: Automatically improve your prompts with AI-driven suggestions
-- **Multi-Model Support**: Choose from 7 different AI models for optimized prompt improvements:
-  - GPT-4 (OpenAI)
-  - GPT-3.5 Turbo (OpenAI)
-  - Claude 3 Opus (Anthropic)
-  - Claude 3 Sonnet (Anthropic)
-  - Claude 3 Haiku (Anthropic)
-  - Gemini Pro (Google)
-  - Llama 2 (Meta)
+### Prompt Enhancement
+- **AI-Powered Improvements** — Automatically rewrite and enhance prompts with model-specific optimizations
+- **Multi-Model Support** — Optimize for GPT-4, GPT-3.5 Turbo, Claude 3 (Opus/Sonnet/Haiku), Gemini Pro, and Llama 2
+- **Quality Scoring** — Real-time quality analysis with actionable breakdown
 
-### User Experience
-- **Copy to Clipboard**: One-click copy of improved prompts
-- **Real-time Feedback**: Toast notifications for all user actions
-- **Loading States**: Visual feedback during prompt processing
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Dark/Light Mode**: Adaptive theme support
+### Prompt Coaching
+- **Real-Time Tips** — Get contextual coaching tips (clarity, specificity, context, structure, constraints, examples) as you type
+- **One-Click Apply** — Apply individual tips or all at once with AI-powered rewrites
+- **Adaptive Prioritization** — Tips are ranked based on historical engagement data so the most useful categories surface first
 
-### Prompt Improvements
-The application enhances your prompts by automatically adding:
-- Specific details and context
-- Quality expectations
-- Style guidance
-- Format specifications
-- Example requests where appropriate
-- Model-specific optimizations
+### Prompt Diff & Version History
+- **Side-by-Side Diff View** — Compare original and improved prompts with highlighted changes
+- **Version History** — Browse, restore, and manage previous prompt iterations
+- **Data Export/Import** — Backup and restore your prompt history
 
-## 🛠️ Technology Stack
+### Template Library
+- **Built-In Templates** — Curated prompt templates across multiple categories
+- **Custom Templates** — Create, edit, and manage your own reusable templates
+- **AI-Powered Recommendations** — Get template suggestions based on your prompt content
+- **Template Favorites** — Bookmark templates for quick access
 
-- **Frontend Framework**: React 18
-- **Build Tool**: Vite
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui
-- **Routing**: React Router DOM
-- **State Management**: React Hooks
-- **Icons**: Lucide React
-- **Animations**: Tailwind CSS Animate
+### Analytics Dashboard
+- **Usage Statistics** — Track total improvements, copy rate, favorite rate, and quality scores
+- **Time-Series Trends** — Visualize prompt, category, model, and template usage over time with interactive charts
+- **Coaching Tip Analytics** — Breakdown of tip types by application rate, priority distribution, and engagement
+- **Most Applied Tips Leaderboard** — Ranked view of which coaching tip categories users find most valuable
+- **Coaching Tip Trend Charts** — Volume and category breakdown of tip interactions over time
+- **Milestone Notifications** — Celebrate usage milestones with toast notifications
+
+### Sharing & Collaboration
+- **Shareable Links** — Generate public links for improved prompts with optional expiration
+- **View Counter** — Track how many times shared prompts have been viewed
+
+### User Management
+- **Authentication** — Email-based signup and login with session persistence
+- **User Profiles** — Display name, bio, and avatar customization
+- **Backup Codes** — Two-factor recovery code support
+- **Dark/Light Mode** — System-aware theme toggle
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | React 18 + TypeScript |
+| **Build Tool** | Vite |
+| **Styling** | Tailwind CSS + tailwindcss-animate |
+| **UI Components** | shadcn/ui (Radix UI primitives) |
+| **Routing** | React Router DOM v6 |
+| **State/Data** | TanStack React Query |
+| **Backend** | Lovable Cloud (Supabase) — Auth, Database, Edge Functions |
+| **AI Gateway** | Lovable AI (Gemini 2.5 Flash) |
+| **Charts** | Recharts |
+| **Icons** | Lucide React |
+| **Theming** | next-themes |
+| **Forms** | React Hook Form + Zod |
+| **Date Utilities** | date-fns |
+| **Notifications** | Sonner + Radix Toast |
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
+- Node.js v16+
 
 ### Installation
 
-1. Clone the repository:
 ```bash
 git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Start the development server:
-```bash
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## 📖 How to Use
 
-1. **Select an AI Model**: Choose your preferred AI model from the dropdown menu
-2. **Enter Your Prompt**: Type or paste your original prompt in the input field
-3. **Click "Improve Prompt"**: Let the application enhance your prompt
-4. **Copy the Result**: Use the copy button to save your improved prompt to clipboard
-5. **Use in Your AI Tool**: Paste the enhanced prompt into your favorite AI application
+1. **Sign up / Log in** — Create an account to persist your data
+2. **Browse Templates** — Pick a starting template or write your own prompt
+3. **Improve** — Select an AI model and click "Improve Prompt"
+4. **Coach** — Review real-time coaching tips and apply suggestions
+5. **Compare** — Use the diff view to see exactly what changed
+6. **Share** — Generate a shareable link for your improved prompt
+7. **Analyze** — Visit the Analytics tab to track your usage patterns
 
-## 🎨 UI Components
+## 📦 Scripts
 
-The application uses a comprehensive set of shadcn/ui components:
-- Buttons with multiple variants
-- Text areas for input
-- Select dropdowns
-- Toast notifications
-- Cards and badges
-- Loading spinners
-- Responsive layouts
-
-## 📦 Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-## 🎯 Use Cases
-
-- **Content Creation**: Improve prompts for blog posts, articles, and social media
-- **Code Generation**: Enhance prompts for better code suggestions
-- **Image Generation**: Optimize prompts for AI art tools
-- **Research**: Create more effective prompts for information gathering
-- **Education**: Learn how to write better AI prompts
-
-## 🌐 Deployment
-
-This application can be easily deployed to:
-- Netlify
-- Vercel
-- GitHub Pages
-- Lovable (recommended)
-
-### Deploy with Lovable
-
-Simply visit [Lovable](https://lovable.dev/projects/d56d67db-1c50-48f2-960c-1aa41fc88736) and click on Share → Publish.
-
-## 🔧 Customization
-
-The application uses a design system with semantic tokens defined in:
-- `src/index.css` - CSS variables and theme configuration
-- `tailwind.config.ts` - Tailwind CSS customization
-
-## 📝 License
-
-This project is built with Lovable and is available for personal and commercial use.
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
-
-## 📞 Support
-
-For support and questions:
-- Visit [Lovable Documentation](https://docs.lovable.dev/)
-- Join [Lovable Discord Community](https://discord.com/channels/1119885301872070706/1280461670979993613)
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
 
 ## 🔗 Links
 
-- **Project URL**: https://lovable.dev/projects/d56d67db-1c50-48f2-960c-1aa41fc88736
-- **Documentation**: https://docs.lovable.dev/
-- **Custom Domain Setup**: https://docs.lovable.dev/tips-tricks/custom-domain/
+- **Live App**: [prompt-enhancer-grove-181.lovable.app](https://prompt-enhancer-grove-181.lovable.app)
+- **Documentation**: [docs.lovable.dev](https://docs.lovable.dev/)
 
 ---
 
