@@ -20,6 +20,7 @@ A powerful web application that helps you craft better AI prompts through intell
 - [📦 Scripts](#-scripts)
 - [🤝 Contributing](#-contributing)
 - [📜 Code of Conduct](#-code-of-conduct)
+- [❓ FAQ](#-faq)
 - [🔗 Links](#-links)
 
 ## ✨ Features
@@ -166,6 +167,48 @@ This project follows the [Contributor Covenant Code of Conduct](https://www.cont
 - Publishing others' private information without permission
 
 Issues or concerns can be reported by opening an issue in the repository.
+
+## ❓ FAQ
+
+<details>
+<summary><strong>Is this app free to use?</strong></summary>
+Yes! The app is completely free. Sign up with your email and start improving prompts right away.
+</details>
+
+<details>
+<summary><strong>Which AI models can I optimize my prompts for?</strong></summary>
+You can optimize for GPT-4, GPT-3.5 Turbo, Claude 3 (Opus, Sonnet, Haiku), Gemini Pro, and Llama 2. Each model has unique strengths, and the improver tailors suggestions accordingly.
+</details>
+
+<details>
+<summary><strong>Do I need an API key to use the app?</strong></summary>
+No. The app uses Lovable AI on the backend, so you don't need to provide any API keys.
+</details>
+
+<details>
+<summary><strong>Can I save and reuse my prompts?</strong></summary>
+Yes. You can favorite improved prompts, browse your version history, and create custom templates for prompts you use frequently.
+</details>
+
+<details>
+<summary><strong>How does the coaching feature work?</strong></summary>
+As you type, the app analyzes your prompt in real time and surfaces contextual tips across categories like clarity, specificity, context, and structure. You can apply tips individually or all at once.
+</details>
+
+<details>
+<summary><strong>Can I share my improved prompts with others?</strong></summary>
+Yes. Use the share feature to generate a public link with an optional expiration date. Anyone with the link can view the original and improved versions.
+</details>
+
+<details>
+<summary><strong>Is my data private?</strong></summary>
+Yes. All prompts and data are tied to your authenticated account and protected by row-level security. Only you can access your data.
+</details>
+
+<details>
+<summary><strong>Does the app work on mobile?</strong></summary>
+Yes. The interface is fully responsive and works on phones, tablets, and desktops.
+</details>
 
 ## 🔗 Links
 
