@@ -106,6 +106,56 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 | `npm run preview` | Preview production build |
 | `npm run lint` | Run ESLint |
 
+## 🤝 Contributing
+
+Contributions are welcome! Here's how to get started:
+
+1. **Fork** the repository
+2. **Clone** your fork locally
+   ```bash
+   git clone <YOUR_FORK_URL>
+   cd ai-prompt-improver
+   npm install
+   ```
+3. **Create a branch** for your feature or fix
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+4. **Make your changes** — follow the existing code style and conventions
+5. **Test** your changes locally with `npm run dev` and `npm run lint`
+6. **Commit** using clear, descriptive messages
+   ```bash
+   git commit -m "feat: add new template category"
+   ```
+7. **Push** and open a **Pull Request** against `main`
+
+### Guidelines
+
+- Keep PRs focused — one feature or fix per PR
+- Follow the existing TypeScript and Tailwind conventions
+- Add meaningful comments for complex logic
+- Ensure no lint errors before submitting
+- Update the README if your change adds or modifies features
+
+## 📜 Code of Conduct
+
+This project follows the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
+
+**Our Pledge:** We are committed to providing a welcoming, inclusive, and harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
+
+**Expected Behavior:**
+- Use welcoming and inclusive language
+- Be respectful of differing viewpoints and experiences
+- Accept constructive criticism gracefully
+- Focus on what is best for the community
+
+**Unacceptable Behavior:**
+- Trolling, insulting or derogatory comments, and personal attacks
+- Public or private harassment
+- Publishing others' private information without permission
+
+Issues or concerns can be reported by opening an issue in the repository.
+
 ## 🔗 Links
 
 - **Live App**: [prompt-enhancer-grove-181.lovable.app](https://prompt-enhancer-grove-181.lovable.app)
