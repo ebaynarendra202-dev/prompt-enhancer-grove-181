@@ -11,6 +11,17 @@ A powerful web application that helps you craft better AI prompts through intell
 
 ![AI Prompt Improver](public/app-screenshot.png)
 
+## 📑 Table of Contents
+
+- [✨ Features](#-features)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🚀 Getting Started](#-getting-started)
+- [📖 How to Use](#-how-to-use)
+- [📦 Scripts](#-scripts)
+- [🤝 Contributing](#-contributing)
+- [📜 Code of Conduct](#-code-of-conduct)
+- [🔗 Links](#-links)
+
 ## ✨ Features
 
 ### Prompt Enhancement
