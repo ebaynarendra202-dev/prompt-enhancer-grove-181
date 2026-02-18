@@ -1,5 +1,12 @@
 # 🧠 AI Prompt Improver
 
+[![Built with Lovable](https://img.shields.io/badge/Built%20with-Lovable-ff69b4?style=flat-square)](https://lovable.dev)
+[![React](https://img.shields.io/badge/React-18-61dafb?style=flat-square&logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript)](https://typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/Version-1.0.0-green?style=flat-square)](https://prompt-enhancer-grove-181.lovable.app)
+
 A powerful web application that helps you craft better AI prompts through intelligent analysis, real-time coaching, and data-driven recommendations.
 
 ![AI Prompt Improver](public/app-screenshot.png)
