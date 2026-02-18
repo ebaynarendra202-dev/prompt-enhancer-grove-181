@@ -2,6 +2,8 @@
 
 A powerful web application that helps you craft better AI prompts through intelligent analysis, real-time coaching, and data-driven recommendations.
 
+![AI Prompt Improver](public/app-screenshot.png)
+
 ## ✨ Features
 
 ### Prompt Enhancement
