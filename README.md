@@ -211,6 +211,11 @@ Yes. All prompts and data are tied to your authenticated account and protected b
 Yes. The interface is fully responsive and works on phones, tablets, and desktops.
 </details>
 
+<details>
+<summary><strong>How does the Analytics Dashboard work?</strong></summary>
+The Analytics Dashboard tracks your prompt improvement activity in real time. It displays total prompts improved, model usage breakdown, category exploration, copy/favorite rates, and average quality scores. You can view time-series trends for prompts, models, categories, and templates, compare the current period against the previous one with percentage change indicators, and explore Coaching Tip Analytics — including application/rejection rates, a "Most Applied Tips" leaderboard, and interaction volume charts over time. Data refreshes every 30 seconds.
+</details>
+
 ## 🗺️ Roadmap
 
 Planned features and improvements for future releases:
