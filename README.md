@@ -21,6 +21,7 @@ A powerful web application that helps you craft better AI prompts through intell
 - [🤝 Contributing](#-contributing)
 - [📜 Code of Conduct](#-code-of-conduct)
 - [❓ FAQ](#-faq)
+- [🗺️ Roadmap](#️-roadmap)
 - [🔗 Links](#-links)
 
 ## ✨ Features
@@ -209,6 +210,21 @@ Yes. All prompts and data are tied to your authenticated account and protected b
 <summary><strong>Does the app work on mobile?</strong></summary>
 Yes. The interface is fully responsive and works on phones, tablets, and desktops.
 </details>
+
+## 🗺️ Roadmap
+
+Planned features and improvements for future releases:
+
+- [ ] **Prompt History Search** — Full-text search across all saved prompts and versions
+- [ ] **Team Workspaces** — Collaborate on prompts with shared templates and analytics
+- [ ] **API Access** — Programmatic access to prompt improvement and analysis
+- [ ] **Browser Extension** — Improve prompts directly from any AI chat interface
+- [ ] **Custom Model Profiles** — Define and save custom optimization profiles for any model
+- [ ] **Prompt Chains** — Build multi-step prompt workflows with sequential refinement
+- [ ] **Export to Markdown/PDF** — Download improved prompts in formatted documents
+- [ ] **Localization** — Multi-language support for the interface and coaching tips
+
+Have a feature request? Open an issue in the repository — we'd love to hear your ideas!
 
 ## 🔗 Links
 
