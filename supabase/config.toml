@@ -15,3 +15,18 @@ verify_jwt = false
 
 [functions.apply-coaching-tip]
 verify_jwt = false
+
+[functions.ab-compare-prompt]
+verify_jwt = false
+
+[functions.structure-prompt]
+verify_jwt = false
+
+[functions.analyze-safety]
+verify_jwt = false
+
+[functions.categorize-prompt]
+verify_jwt = false
+
+[functions.suggest-chain]
+verify_jwt = false
