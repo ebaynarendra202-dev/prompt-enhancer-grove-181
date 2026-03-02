@@ -9,6 +9,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare, Keyboard, Download, Upload } from "lucide-react";
+import PromptABComparison from "./PromptABComparison";
+import PromptSafetyAnalysis from "./PromptSafetyAnalysis";
 import { exportData, parseBackupFile, PromptHistory } from "@/lib/dataBackup";
 import PromptShareDialog from "./PromptShareDialog";
 import { useRef } from "react";
@@ -868,6 +870,13 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
               </div>
             )}
           </div>
+        )}
+
+        {prompt.trim() && (
+          <>
+            <PromptABComparison prompt={prompt} enhancements={selectedEnhancements} />
+            <PromptSafetyAnalysis prompt={prompt} />
+          </>
         )}
       </div>
     </div>

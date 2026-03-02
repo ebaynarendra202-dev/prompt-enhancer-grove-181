@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import PromptImprover from "@/components/PromptImprover";
 import TemplateLibrary from "@/components/TemplateLibrary";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import NaturalLanguageInput from "@/components/NaturalLanguageInput";
+import PromptChainBuilder from "@/components/PromptChainBuilder";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wand2, BarChart3, LogOut, User } from "lucide-react";
+import { Wand2, BarChart3, LogOut, User, Link2, MessageSquare } from "lucide-react";
 import { trackTemplateUsage, useAnalytics } from "@/hooks/useAnalytics";
 import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 import { useAuth } from "@/hooks/useAuth";
@@ -73,10 +75,18 @@ const Index = () => {
           </div>
         </div>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4">
             <TabsTrigger value="improver" className="flex items-center gap-2">
               <Wand2 className="h-4 w-4" />
-              Prompt Improver
+              Improver
+            </TabsTrigger>
+            <TabsTrigger value="natural" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Natural Input
+            </TabsTrigger>
+            <TabsTrigger value="chains" className="flex items-center gap-2">
+              <Link2 className="h-4 w-4" />
+              Chains
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -93,6 +103,24 @@ const Index = () => {
             
             <div ref={improverRef}>
               <PromptImprover initialPrompt={selectedPrompt} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="natural" className="mt-8">
+            <div className="max-w-3xl mx-auto">
+              <NaturalLanguageInput onUsePrompt={(prompt) => {
+                setSelectedPrompt(prompt);
+                setActiveTab("improver");
+                setTimeout(() => {
+                  improverRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 100);
+              }} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="chains" className="mt-8">
+            <div className="max-w-3xl mx-auto">
+              <PromptChainBuilder />
             </div>
           </TabsContent>
 
