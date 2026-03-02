@@ -170,36 +170,104 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_chain_steps: {
+        Row: {
+          chain_id: string
+          created_at: string
+          id: string
+          output_text: string | null
+          prompt_text: string
+          step_order: number
+        }
+        Insert: {
+          chain_id: string
+          created_at?: string
+          id?: string
+          output_text?: string | null
+          prompt_text?: string
+          step_order?: number
+        }
+        Update: {
+          chain_id?: string
+          created_at?: string
+          id?: string
+          output_text?: string | null
+          prompt_text?: string
+          step_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_chain_steps_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_chains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompt_chains: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       prompt_improvements: {
         Row: {
           ai_model: string
+          category: string | null
+          complexity: string | null
           created_at: string
           id: string
           improved_prompt: string
           original_prompt: string
           quality_score: number | null
+          tags: string[] | null
           user_id: string | null
           was_copied: boolean | null
           was_favorited: boolean | null
         }
         Insert: {
           ai_model: string
+          category?: string | null
+          complexity?: string | null
           created_at?: string
           id?: string
           improved_prompt: string
           original_prompt: string
           quality_score?: number | null
+          tags?: string[] | null
           user_id?: string | null
           was_copied?: boolean | null
           was_favorited?: boolean | null
         }
         Update: {
           ai_model?: string
+          category?: string | null
+          complexity?: string | null
           created_at?: string
           id?: string
           improved_prompt?: string
           original_prompt?: string
           quality_score?: number | null
+          tags?: string[] | null
           user_id?: string | null
           was_copied?: boolean | null
           was_favorited?: boolean | null
