@@ -35,10 +35,26 @@ const NaturalLanguageInput = ({ onUsePrompt }: NaturalLanguageInputProps) => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("structure-prompt", {
-        body: { input: input.trim() },
+        body: { description: input.trim() },
       });
       if (error) throw error;
-      setStructured(data);
+      
+      // The edge function returns { structuredPrompt: string } with labeled sections
+      const text = data.structuredPrompt || "";
+      const parseSection = (label: string) => {
+        const regex = new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+?)(?=\\n\\*\\*|$)`, 's');
+        const match = text.match(regex);
+        return match ? match[1].trim() : "";
+      };
+      
+      setStructured({
+        role: parseSection("Role"),
+        task: parseSection("Task"),
+        context: parseSection("Context"),
+        format: parseSection("Format"),
+        constraints: parseSection("Constraints"),
+        fullPrompt: text,
+      });
     } catch (e: any) {
       toast({ title: "Structuring failed", description: e.message || "Try again later", variant: "destructive" });
     } finally {
