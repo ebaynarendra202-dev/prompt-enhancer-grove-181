@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare, Keyboard, Download, Upload } from "lucide-react";
 import PromptABComparison from "./PromptABComparison";
 import PromptSafetyAnalysis from "./PromptSafetyAnalysis";
