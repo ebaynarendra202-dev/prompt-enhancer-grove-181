@@ -6,6 +6,8 @@ export interface PromptHistory {
   improvedPrompt: string;
   model: string;
   timestamp: number;
+  category?: string;
+  complexity?: string;
 }
 
 export interface AppSettings {

@@ -88,6 +88,8 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [showComparison, setShowComparison] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
   const [history, setHistory] = useState<PromptHistory[]>([]);
+  const [historyFilterCategory, setHistoryFilterCategory] = useState<string>("all");
+  const [historyFilterComplexity, setHistoryFilterComplexity] = useState<string>("all");
   const { templates: customTemplates } = useCustomTemplates();
   const [templateSuggestions, setTemplateSuggestions] = useState<TemplateSuggestion[]>([]);
   const [isSuggestingTemplates, setIsSuggestingTemplates] = useState(false);
@@ -336,6 +338,19 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
         body: { prompt: structuredPrompt },
       }).then(async ({ data: catData }) => {
         if (catData?.category) {
+          // Update local history with category/complexity
+          setHistory(prev => {
+            const updated = prev.map(item =>
+              item.id === newHistoryItem.id
+                ? { ...item, category: catData.category, complexity: catData.complexity || undefined }
+                : item
+            );
+            try {
+              localStorage.setItem("promptHistory", JSON.stringify(updated));
+            } catch (e) { /* ignore */ }
+            return updated;
+          });
+
           // Find the most recent prompt_improvement for this user and update it
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
@@ -581,7 +596,31 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                 <div className="mt-6 space-y-4">
                   {history.length > 0 ? (
                     <>
-                      <div className="flex justify-end">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <Select value={historyFilterCategory} onValueChange={setHistoryFilterCategory}>
+                            <SelectTrigger className="h-8 w-[130px] text-xs">
+                              <SelectValue placeholder="Category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Categories</SelectItem>
+                              {Array.from(new Set(history.map(h => h.category).filter(Boolean))).map(cat => (
+                                <SelectItem key={cat} value={cat!}>{cat}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select value={historyFilterComplexity} onValueChange={setHistoryFilterComplexity}>
+                            <SelectTrigger className="h-8 w-[130px] text-xs">
+                              <SelectValue placeholder="Complexity" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Complexity</SelectItem>
+                              {Array.from(new Set(history.map(h => h.complexity).filter(Boolean))).map(c => (
+                                <SelectItem key={c} value={c!}>{c}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -591,16 +630,27 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                           Clear All
                         </Button>
                       </div>
-                      <ScrollArea className="h-[calc(100vh-200px)]">
+                      <ScrollArea className="h-[calc(100vh-250px)]">
                         <div className="space-y-4 pr-4">
-                          {history.map((item) => (
+                          {history
+                            .filter(item => historyFilterCategory === "all" || item.category === historyFilterCategory)
+                            .filter(item => historyFilterComplexity === "all" || item.complexity === historyFilterComplexity)
+                            .map((item) => (
                             <div
                               key={item.id}
                               className="border border-border rounded-lg p-4 space-y-3 hover:bg-muted/50 transition-colors cursor-pointer"
                               onClick={() => loadFromHistory(item)}
                             >
                               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                <span className="font-medium uppercase">{item.model}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium uppercase">{item.model}</span>
+                                  {item.category && (
+                                    <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[10px]">{item.category}</span>
+                                  )}
+                                  {item.complexity && (
+                                    <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground text-[10px]">{item.complexity}</span>
+                                  )}
+                                </div>
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-3 w-3" />
                                   {formatDistanceToNow(item.timestamp, { addSuffix: true })}
