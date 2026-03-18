@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript)](https://typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-1.0.0-green?style=flat-square)](https://prompt-enhancer-grove-181.lovable.app)
+[![Version](https://img.shields.io/badge/Version-1.1.0-green?style=flat-square)](https://prompt-enhancer-grove-181.lovable.app)
 
 A powerful web application that helps you craft better AI prompts through intelligent analysis, real-time coaching, and data-driven recommendations.
 
@@ -30,6 +30,8 @@ A powerful web application that helps you craft better AI prompts through intell
 - **AI-Powered Improvements** — Automatically rewrite and enhance prompts with model-specific optimizations
 - **Multi-Model Support** — Optimize for GPT-4, GPT-3.5 Turbo, Claude 3 (Opus/Sonnet/Haiku), Gemini Pro, and Llama 2
 - **Quality Scoring** — Real-time quality analysis with actionable breakdown
+- **Auto-Categorization** — Prompts are automatically categorized by topic, complexity, and tags after each improvement
+- **Customizable Enhancements** — Toggle improvements like high-quality output, structured formatting, step-by-step reasoning, examples, and more
 
 ### Prompt Coaching
 - **Real-Time Tips** — Get contextual coaching tips (clarity, specificity, context, structure, constraints, examples) as you type
@@ -39,13 +41,36 @@ A powerful web application that helps you craft better AI prompts through intell
 ### Prompt Diff & Version History
 - **Side-by-Side Diff View** — Compare original and improved prompts with highlighted changes
 - **Version History** — Browse, restore, and manage previous prompt iterations
-- **Data Export/Import** — Backup and restore your prompt history
+- **Data Export/Import** — Backup and restore your prompt history as JSON
+
+### Prompt History Search & Filtering
+- **Keyword Search** — Full-text search across original and improved prompts in history
+- **Category Filters** — Filter history by auto-detected prompt category
+- **Complexity Filters** — Filter history by prompt complexity level (simple, moderate, complex)
+
+### A/B Comparison
+- **Variant Generation** — Generate multiple improvement variants (Clarity, Detail, Creativity) for any prompt
+- **Trade-off Analysis** — Each variant includes a description of its trade-offs
+- **One-Click Copy** — Copy any variant to clipboard instantly
+
+### Safety Analysis
+- **Prompt Safety Scoring** — Analyze prompts for potential safety concerns
+- **Risk Categories** — Identify issues across multiple safety dimensions
+
+### Natural Language Input
+- **Conversational Prompt Building** — Describe what you need in plain language and get a structured prompt generated for you
+
+### Prompt Chains
+- **Multi-Step Workflows** — Build sequential prompt chains where each step feeds into the next
+- **AI-Suggested Chains** — Get AI-generated chain suggestions based on your goal
+- **Persistent Storage** — Chains are saved to the database and persist across sessions
 
 ### Template Library
 - **Built-In Templates** — Curated prompt templates across multiple categories
-- **Custom Templates** — Create, edit, and manage your own reusable templates
+- **Custom Templates** — Create, edit, and manage your own reusable templates with tags
 - **AI-Powered Recommendations** — Get template suggestions based on your prompt content
 - **Template Favorites** — Bookmark templates for quick access
+- **Template Usage Tracking** — Track which templates are used most frequently
 
 ### Analytics Dashboard
 - **Usage Statistics** — Track total improvements, copy rate, favorite rate, and quality scores
@@ -54,28 +79,30 @@ A powerful web application that helps you craft better AI prompts through intell
 - **Most Applied Tips Leaderboard** — Ranked view of which coaching tip categories users find most valuable
 - **Coaching Tip Trend Charts** — Volume and category breakdown of tip interactions over time
 - **Milestone Notifications** — Celebrate usage milestones with toast notifications
+- **Filterable Date Ranges** — Filter analytics by custom time periods
 
 ### Sharing & Collaboration
 - **Shareable Links** — Generate public links for improved prompts with optional expiration
 - **View Counter** — Track how many times shared prompts have been viewed
+- **Public Shared Prompt Page** — Recipients can view original vs improved prompts side by side
 
 ### User Management
 - **Authentication** — Email-based signup and login with session persistence
 - **User Profiles** — Display name, bio, and avatar customization
 - **Backup Codes** — Two-factor recovery code support
-- **Dark/Light Mode** — System-aware theme toggle
+- **Dark/Light Mode** — System-aware theme toggle with manual override
 
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | **Framework** | React 18 + TypeScript |
-| **Build Tool** | Vite |
-| **Styling** | Tailwind CSS + tailwindcss-animate |
+| **Build Tool** | Vite 5 |
+| **Styling** | Tailwind CSS 3 + tailwindcss-animate |
 | **UI Components** | shadcn/ui (Radix UI primitives) |
 | **Routing** | React Router DOM v6 |
-| **State/Data** | TanStack React Query |
-| **Backend** | Lovable Cloud (Supabase) — Auth, Database, Edge Functions |
+| **State/Data** | TanStack React Query v5 |
+| **Backend** | Lovable Cloud (Supabase) — Auth, Database, Edge Functions, Storage |
 | **AI Gateway** | Lovable AI (Gemini 2.5 Flash) |
 | **Charts** | Recharts |
 | **Icons** | Lucide React |
@@ -83,6 +110,25 @@ A powerful web application that helps you craft better AI prompts through intell
 | **Forms** | React Hook Form + Zod |
 | **Date Utilities** | date-fns |
 | **Notifications** | Sonner + Radix Toast |
+| **Carousel** | Embla Carousel |
+| **QR Codes** | qrcode |
+| **Resizable Panels** | react-resizable-panels |
+
+### Edge Functions
+
+| Function | Purpose |
+|----------|---------|
+| `improve-prompt` | AI-powered prompt improvement with model-specific optimization |
+| `analyze-prompt` | Quality scoring and prompt analysis |
+| `coach-prompt` | Real-time coaching tip generation |
+| `apply-coaching-tip` | Apply a single coaching tip to rewrite the prompt |
+| `apply-all-coaching-tips` | Apply all coaching tips at once |
+| `ab-compare-prompt` | Generate A/B comparison variants |
+| `categorize-prompt` | Auto-categorize prompts by topic, complexity, and tags |
+| `structure-prompt` | Convert natural language descriptions into structured prompts |
+| `suggest-chain` | AI-generated prompt chain suggestions |
+| `analyze-safety` | Prompt safety and risk analysis |
+| `recommend-templates` | AI-powered template recommendations |
 
 ## 🚀 Getting Started
 
@@ -104,11 +150,14 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 1. **Sign up / Log in** — Create an account to persist your data
 2. **Browse Templates** — Pick a starting template or write your own prompt
-3. **Improve** — Select an AI model and click "Improve Prompt"
+3. **Improve** — Select an AI model, toggle enhancements, and click "Improve Prompt"
 4. **Coach** — Review real-time coaching tips and apply suggestions
-5. **Compare** — Use the diff view to see exactly what changed
-6. **Share** — Generate a shareable link for your improved prompt
-7. **Analyze** — Visit the Analytics tab to track your usage patterns
+5. **Compare** — Use the diff view or A/B comparison to evaluate variants
+6. **Search & Filter** — Use keyword search and category/complexity filters in history
+7. **Build Chains** — Create multi-step prompt workflows in the Chains tab
+8. **Natural Input** — Describe what you need in plain language and get a structured prompt
+9. **Share** — Generate a shareable link for your improved prompt
+10. **Analyze** — Visit the Analytics tab to track your usage patterns
 
 ## 📦 Scripts
 
@@ -216,16 +265,24 @@ Yes. The interface is fully responsive and works on phones, tablets, and desktop
 The Analytics Dashboard tracks your prompt improvement activity in real time. It displays total prompts improved, model usage breakdown, category exploration, copy/favorite rates, and average quality scores. You can view time-series trends for prompts, models, categories, and templates, compare the current period against the previous one with percentage change indicators, and explore Coaching Tip Analytics — including application/rejection rates, a "Most Applied Tips" leaderboard, and interaction volume charts over time. Data refreshes every 30 seconds.
 </details>
 
+<details>
+<summary><strong>What are Prompt Chains?</strong></summary>
+Prompt Chains let you build multi-step workflows where each prompt builds on the output of the previous one. You can get AI-suggested chains based on your goal or create your own from scratch.
+</details>
+
+<details>
+<summary><strong>How does auto-categorization work?</strong></summary>
+After each prompt improvement, the app automatically analyzes and categorizes your prompt by topic, complexity level, and relevant tags. These are saved alongside your history and can be used to filter and search your past prompts.
+</details>
+
 ## 🗺️ Roadmap
 
 Planned features and improvements for future releases:
 
-- [ ] **Prompt History Search** — Full-text search across all saved prompts and versions
 - [ ] **Team Workspaces** — Collaborate on prompts with shared templates and analytics
 - [ ] **API Access** — Programmatic access to prompt improvement and analysis
 - [ ] **Browser Extension** — Improve prompts directly from any AI chat interface
 - [ ] **Custom Model Profiles** — Define and save custom optimization profiles for any model
-- [ ] **Prompt Chains** — Build multi-step prompt workflows with sequential refinement
 - [ ] **Export to Markdown/PDF** — Download improved prompts in formatted documents
 - [ ] **Localization** — Multi-language support for the interface and coaching tips
 
