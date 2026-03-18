@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import { Loader2, Copy, Wand2, Info, History, Clock, Star, Trash2, GitCompare, Keyboard, Download, Upload } from "lucide-react";
 import PromptABComparison from "./PromptABComparison";
 import PromptSafetyAnalysis from "./PromptSafetyAnalysis";
@@ -90,6 +91,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [history, setHistory] = useState<PromptHistory[]>([]);
   const [historyFilterCategory, setHistoryFilterCategory] = useState<string>("all");
   const [historyFilterComplexity, setHistoryFilterComplexity] = useState<string>("all");
+  const [historySearchQuery, setHistorySearchQuery] = useState<string>("");
   const { templates: customTemplates } = useCustomTemplates();
   const [templateSuggestions, setTemplateSuggestions] = useState<TemplateSuggestion[]>([]);
   const [isSuggestingTemplates, setIsSuggestingTemplates] = useState(false);
@@ -596,7 +598,14 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                 <div className="mt-6 space-y-4">
                   {history.length > 0 ? (
                     <>
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="space-y-3">
+                        <Input
+                          placeholder="Search prompts..."
+                          value={historySearchQuery}
+                          onChange={(e) => setHistorySearchQuery(e.target.value)}
+                          className="h-8 text-xs"
+                        />
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-2">
                           <Select value={historyFilterCategory} onValueChange={setHistoryFilterCategory}>
                             <SelectTrigger className="h-8 w-[130px] text-xs">
@@ -630,11 +639,17 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                           Clear All
                         </Button>
                       </div>
-                      <ScrollArea className="h-[calc(100vh-250px)]">
+                      </div>
+                      <ScrollArea className="h-[calc(100vh-280px)]">
                         <div className="space-y-4 pr-4">
                           {history
                             .filter(item => historyFilterCategory === "all" || item.category === historyFilterCategory)
                             .filter(item => historyFilterComplexity === "all" || item.complexity === historyFilterComplexity)
+                            .filter(item => {
+                              if (!historySearchQuery.trim()) return true;
+                              const q = historySearchQuery.toLowerCase();
+                              return item.originalPrompt.toLowerCase().includes(q) || item.improvedPrompt.toLowerCase().includes(q);
+                            })
                             .map((item) => (
                             <div
                               key={item.id}
