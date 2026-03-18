@@ -330,6 +330,29 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
       
       // Add to version history
       addVersion(originalPrompt, structuredPrompt, selectedModel);
+
+      // Auto-categorize in the background (fire-and-forget)
+      supabase.functions.invoke("categorize-prompt", {
+        body: { prompt: structuredPrompt },
+      }).then(async ({ data: catData }) => {
+        if (catData?.category) {
+          // Find the most recent prompt_improvement for this user and update it
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            await supabase
+              .from("prompt_improvements")
+              .update({
+                category: catData.category,
+                tags: catData.tags || [],
+                complexity: catData.complexity || null,
+              })
+              .eq("user_id", user.id)
+              .eq("improved_prompt", structuredPrompt)
+              .order("created_at", { ascending: false })
+              .limit(1);
+          }
+        }
+      }).catch((err) => console.warn("Auto-categorization failed:", err));
       
       toast({
         title: "Prompt improved!",
