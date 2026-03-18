@@ -597,7 +597,14 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                 <div className="mt-6 space-y-4">
                   {history.length > 0 ? (
                     <>
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="space-y-3">
+                        <Input
+                          placeholder="Search prompts..."
+                          value={historySearchQuery}
+                          onChange={(e) => setHistorySearchQuery(e.target.value)}
+                          className="h-8 text-xs"
+                        />
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-2">
                           <Select value={historyFilterCategory} onValueChange={setHistoryFilterCategory}>
                             <SelectTrigger className="h-8 w-[130px] text-xs">
