@@ -638,7 +638,8 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                           Clear All
                         </Button>
                       </div>
-                      <ScrollArea className="h-[calc(100vh-250px)]">
+                      </div>
+                      <ScrollArea className="h-[calc(100vh-280px)]">
                         <div className="space-y-4 pr-4">
                           {history
                             .filter(item => historyFilterCategory === "all" || item.category === historyFilterCategory)
