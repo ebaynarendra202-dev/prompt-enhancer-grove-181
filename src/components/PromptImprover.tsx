@@ -90,6 +90,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [history, setHistory] = useState<PromptHistory[]>([]);
   const [historyFilterCategory, setHistoryFilterCategory] = useState<string>("all");
   const [historyFilterComplexity, setHistoryFilterComplexity] = useState<string>("all");
+  const [historySearchQuery, setHistorySearchQuery] = useState<string>("");
   const { templates: customTemplates } = useCustomTemplates();
   const [templateSuggestions, setTemplateSuggestions] = useState<TemplateSuggestion[]>([]);
   const [isSuggestingTemplates, setIsSuggestingTemplates] = useState(false);
