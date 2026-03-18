@@ -336,6 +336,19 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
         body: { prompt: structuredPrompt },
       }).then(async ({ data: catData }) => {
         if (catData?.category) {
+          // Update local history with category/complexity
+          setHistory(prev => {
+            const updated = prev.map(item =>
+              item.id === newHistoryItem.id
+                ? { ...item, category: catData.category, complexity: catData.complexity || undefined }
+                : item
+            );
+            try {
+              localStorage.setItem("promptHistory", JSON.stringify(updated));
+            } catch (e) { /* ignore */ }
+            return updated;
+          });
+
           // Find the most recent prompt_improvement for this user and update it
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
