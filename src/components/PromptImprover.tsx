@@ -644,6 +644,11 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                           {history
                             .filter(item => historyFilterCategory === "all" || item.category === historyFilterCategory)
                             .filter(item => historyFilterComplexity === "all" || item.complexity === historyFilterComplexity)
+                            .filter(item => {
+                              if (!historySearchQuery.trim()) return true;
+                              const q = historySearchQuery.toLowerCase();
+                              return item.originalPrompt.toLowerCase().includes(q) || item.improvedPrompt.toLowerCase().includes(q);
+                            })
                             .map((item) => (
                             <div
                               key={item.id}
