@@ -18,6 +18,7 @@ A powerful web application that helps you craft better AI prompts through intell
 - [🚀 Getting Started](#-getting-started)
 - [📖 How to Use](#-how-to-use)
 - [📦 Scripts](#-scripts)
+- [📋 Changelog](CHANGELOG.md)
 - [🤝 Contributing](#-contributing)
 - [📜 Code of Conduct](#-code-of-conduct)
 - [❓ FAQ](#-faq)
