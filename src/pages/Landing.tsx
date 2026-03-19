@@ -151,6 +151,70 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Demo / Preview */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              See it in action
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Watch how a vague prompt becomes a precise, effective instruction.
+            </p>
+          </div>
+
+          {/* Example tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {demoExamples.map((ex, i) => (
+              <button
+                key={ex.label}
+                onClick={() => setActiveDemoIndex(i)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
+                  i === activeDemoIndex
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-muted text-muted-foreground border-border hover:bg-accent"
+                }`}
+              >
+                {ex.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Before / After cards */}
+          <div className="grid md:grid-cols-2 gap-6 items-start">
+            <Card className="border-destructive/30 bg-destructive/5">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-destructive">Before</span>
+                </div>
+                <p className="text-foreground text-base leading-relaxed font-mono bg-background/60 rounded-lg p-4 border border-border">
+                  {activeDemo.before}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-primary">After</span>
+                </div>
+                <p className="text-foreground text-sm leading-relaxed font-mono bg-background/60 rounded-lg p-4 border border-border">
+                  {activeDemo.after}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-10">
+            <Button onClick={() => navigate("/auth")} variant="outline" className="text-base">
+              Try it yourself
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section id="features" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
