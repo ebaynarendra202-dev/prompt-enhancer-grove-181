@@ -144,7 +144,7 @@ export const useAuth = () => {
         description: "Your password has been updated successfully.",
       });
 
-      navigate('/');
+      navigate('/app');
       return { error: null };
     } catch (error: any) {
       toast({
