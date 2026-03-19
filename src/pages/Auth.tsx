@@ -174,7 +174,7 @@ const Auth = () => {
         description: "You've been signed in successfully.",
       });
 
-      navigate('/');
+      navigate('/app');
     } catch (error: any) {
       setErrors({ mfa: error.message });
       toast({

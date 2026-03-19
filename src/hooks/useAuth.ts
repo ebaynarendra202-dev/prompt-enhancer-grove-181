@@ -75,7 +75,7 @@ export const useAuth = () => {
         description: "You've been signed in successfully.",
       });
 
-      navigate('/');
+      navigate('/app');
       return { data, error: null };
     } catch (error: any) {
       toast({
