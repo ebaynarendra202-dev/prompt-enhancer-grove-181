@@ -33,7 +33,7 @@ export const useAuth = () => {
 
   const signUp = async (email: string, password: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/app`;
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -75,7 +75,7 @@ export const useAuth = () => {
         description: "You've been signed in successfully.",
       });
 
-      navigate('/');
+      navigate('/app');
       return { data, error: null };
     } catch (error: any) {
       toast({
@@ -144,7 +144,7 @@ export const useAuth = () => {
         description: "Your password has been updated successfully.",
       });
 
-      navigate('/');
+      navigate('/app');
       return { error: null };
     } catch (error: any) {
       toast({

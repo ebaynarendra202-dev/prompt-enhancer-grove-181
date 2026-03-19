@@ -46,7 +46,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/app`,
         },
       });
 
@@ -67,7 +67,7 @@ const Auth = () => {
       if (isReset) {
         setShowPasswordUpdate(true);
       } else {
-        navigate('/');
+        navigate('/app');
       }
     }
   }, [user, loading, navigate, searchParams]);
@@ -129,7 +129,7 @@ const Auth = () => {
         description: "You've been signed in successfully.",
       });
 
-      navigate('/');
+      navigate('/app');
     } catch (error: any) {
       toast({
         title: "Login failed",
@@ -174,7 +174,7 @@ const Auth = () => {
         description: "You've been signed in successfully.",
       });
 
-      navigate('/');
+      navigate('/app');
     } catch (error: any) {
       setErrors({ mfa: error.message });
       toast({
