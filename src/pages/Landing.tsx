@@ -82,6 +82,8 @@ const demoExamples = [
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [activeDemoIndex, setActiveDemoIndex] = useState(0);
+  const activeDemo = demoExamples[activeDemoIndex];
 
   return (
     <div className="min-h-screen bg-background">
