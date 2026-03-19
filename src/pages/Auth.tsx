@@ -67,7 +67,7 @@ const Auth = () => {
       if (isReset) {
         setShowPasswordUpdate(true);
       } else {
-        navigate('/');
+        navigate('/app');
       }
     }
   }, [user, loading, navigate, searchParams]);
