@@ -62,6 +62,24 @@ const benefits = [
   "Track your progress with detailed analytics",
 ];
 
+const demoExamples = [
+  {
+    label: "Content Writing",
+    before: "Write a blog post about AI",
+    after: `You are an experienced tech journalist. Write a 1,200-word blog post titled "How AI Is Reshaping Creative Work in 2026." Structure it with an engaging hook, three concrete use-case sections (visual design, copywriting, music production), and a balanced conclusion addressing both opportunities and ethical considerations. Use a conversational yet authoritative tone. Include at least one real-world example per section.`,
+  },
+  {
+    label: "Code Review",
+    before: "Review my code",
+    after: `Act as a senior software engineer conducting a thorough code review. Analyze the provided code for: (1) correctness and potential bugs, (2) performance bottlenecks, (3) security vulnerabilities, (4) adherence to SOLID principles, and (5) readability and naming conventions. For each issue found, explain why it matters and provide a concrete fix. Prioritize findings by severity (critical → minor). End with a summary of strengths and a ranked list of improvements.`,
+  },
+  {
+    label: "Data Analysis",
+    before: "Analyze this data for me",
+    after: `You are a data analyst with expertise in business intelligence. Analyze the provided dataset and deliver: (1) a statistical summary of key metrics with mean, median, and standard deviation, (2) identification of the top 3 trends or patterns with supporting evidence, (3) any anomalies or outliers worth investigating, and (4) three actionable recommendations based on your findings. Present results in clearly labeled sections with bullet points. Use plain language suitable for a non-technical executive audience.`,
+  },
+];
+
 const Landing = () => {
   const navigate = useNavigate();
 
