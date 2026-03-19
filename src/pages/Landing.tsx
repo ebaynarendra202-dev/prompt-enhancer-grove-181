@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -12,6 +13,7 @@ import {
   Sparkles,
   ArrowRight,
   CheckCircle2,
+  ChevronRight,
 } from "lucide-react";
 
 const features = [
@@ -60,8 +62,28 @@ const benefits = [
   "Track your progress with detailed analytics",
 ];
 
+const demoExamples = [
+  {
+    label: "Content Writing",
+    before: "Write a blog post about AI",
+    after: `You are an experienced tech journalist. Write a 1,200-word blog post titled "How AI Is Reshaping Creative Work in 2026." Structure it with an engaging hook, three concrete use-case sections (visual design, copywriting, music production), and a balanced conclusion addressing both opportunities and ethical considerations. Use a conversational yet authoritative tone. Include at least one real-world example per section.`,
+  },
+  {
+    label: "Code Review",
+    before: "Review my code",
+    after: `Act as a senior software engineer conducting a thorough code review. Analyze the provided code for: (1) correctness and potential bugs, (2) performance bottlenecks, (3) security vulnerabilities, (4) adherence to SOLID principles, and (5) readability and naming conventions. For each issue found, explain why it matters and provide a concrete fix. Prioritize findings by severity (critical → minor). End with a summary of strengths and a ranked list of improvements.`,
+  },
+  {
+    label: "Data Analysis",
+    before: "Analyze this data for me",
+    after: `You are a data analyst with expertise in business intelligence. Analyze the provided dataset and deliver: (1) a statistical summary of key metrics with mean, median, and standard deviation, (2) identification of the top 3 trends or patterns with supporting evidence, (3) any anomalies or outliers worth investigating, and (4) three actionable recommendations based on your findings. Present results in clearly labeled sections with bullet points. Use plain language suitable for a non-technical executive audience.`,
+  },
+];
+
 const Landing = () => {
   const navigate = useNavigate();
+  const [activeDemoIndex, setActiveDemoIndex] = useState(0);
+  const activeDemo = demoExamples[activeDemoIndex];
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,6 +148,70 @@ const Landing = () => {
               {b}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Demo / Preview */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              See it in action
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Watch how a vague prompt becomes a precise, effective instruction.
+            </p>
+          </div>
+
+          {/* Example tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {demoExamples.map((ex, i) => (
+              <button
+                key={ex.label}
+                onClick={() => setActiveDemoIndex(i)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
+                  i === activeDemoIndex
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-muted text-muted-foreground border-border hover:bg-accent"
+                }`}
+              >
+                {ex.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Before / After cards */}
+          <div className="grid md:grid-cols-2 gap-6 items-start">
+            <Card className="border-destructive/30 bg-destructive/5">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-destructive">Before</span>
+                </div>
+                <p className="text-foreground text-base leading-relaxed font-mono bg-background/60 rounded-lg p-4 border border-border">
+                  {activeDemo.before}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-primary">After</span>
+                </div>
+                <p className="text-foreground text-sm leading-relaxed font-mono bg-background/60 rounded-lg p-4 border border-border">
+                  {activeDemo.after}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-10">
+            <Button onClick={() => navigate("/auth")} variant="outline" className="text-base">
+              Try it yourself
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </section>
 
