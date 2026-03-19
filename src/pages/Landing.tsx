@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -12,6 +13,7 @@ import {
   Sparkles,
   ArrowRight,
   CheckCircle2,
+  ChevronRight,
 } from "lucide-react";
 
 const features = [
