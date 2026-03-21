@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -12,7 +13,6 @@ import {
   MessageSquare,
   Sparkles,
   ArrowRight,
-  CheckCircle2,
   ChevronRight,
 } from "lucide-react";
 
@@ -104,6 +104,17 @@ const demoExamples = [
   },
 ];
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const stagger = {
+  visible: {
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
 const Landing = () => {
   const navigate = useNavigate();
   const [activeDemoIndex, setActiveDemoIndex] = useState(0);
@@ -135,21 +146,42 @@ const Landing = () => {
 
       {/* Hero */}
       <section className="py-24 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border bg-muted text-muted-foreground text-sm mb-8">
+        <motion.div
+          className="max-w-4xl mx-auto text-center"
+          initial="hidden"
+          animate="visible"
+          variants={stagger}
+        >
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border bg-muted text-muted-foreground text-sm mb-8"
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+          >
             <Zap className="h-4 w-4" />
             AI-powered prompt engineering
-          </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground leading-tight mb-6">
+          </motion.div>
+          <motion.h1
+            className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground leading-tight mb-6"
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+          >
             Write better prompts.
             <br />
             <span className="text-primary">Get better results.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+          </motion.h1>
+          <motion.p
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+          >
             Stop guessing. Prompt Improver analyzes, scores, and enhances your
             AI prompts so you get consistent, high-quality outputs every time.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          </motion.p>
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+          >
             <Button size="lg" className="text-base px-8" onClick={() => navigate("/auth")}>
               Start Improving Prompts
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -159,41 +191,53 @@ const Landing = () => {
             }}>
               See Features
             </Button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Stats bar */}
       <section className="border-y border-border bg-muted/50 py-12 px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <motion.div
+          className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={stagger}
+        >
           {[
             { value: "50K+", label: "Prompts Improved" },
             { value: "8,200+", label: "Active Users" },
             { value: "+42%", label: "Avg. Quality Increase" },
             { value: "6", label: "AI Models Supported" },
           ].map((stat) => (
-            <div key={stat.label}>
+            <motion.div key={stat.label} variants={fadeUp} transition={{ duration: 0.5 }}>
               <p className="text-3xl md:text-4xl font-extrabold text-primary">{stat.value}</p>
               <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* Demo / Preview */}
       <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
+        <motion.div
+          className="max-w-5xl mx-auto"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={stagger}
+        >
+          <motion.div className="text-center mb-12" variants={fadeUp} transition={{ duration: 0.5 }}>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               See it in action
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Watch how a vague prompt becomes a precise, effective instruction.
             </p>
-          </div>
+          </motion.div>
 
           {/* Example tabs */}
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
+          <motion.div className="flex flex-wrap justify-center gap-2 mb-10" variants={fadeUp} transition={{ duration: 0.5 }}>
             {demoExamples.map((ex, i) => (
               <button
                 key={ex.label}
@@ -207,10 +251,10 @@ const Landing = () => {
                 {ex.label}
               </button>
             ))}
-          </div>
+          </motion.div>
 
           {/* Before / After cards */}
-          <div className="grid md:grid-cols-2 gap-6 items-start">
+          <motion.div className="grid md:grid-cols-2 gap-6 items-start" variants={fadeUp} transition={{ duration: 0.5 }}>
             <Card className="border-destructive/30 bg-destructive/5">
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
@@ -233,85 +277,119 @@ const Landing = () => {
                 </p>
               </CardContent>
             </Card>
-          </div>
+          </motion.div>
 
-          <div className="text-center mt-10">
+          <motion.div className="text-center mt-10" variants={fadeUp} transition={{ duration: 0.5 }}>
             <Button onClick={() => navigate("/auth")} variant="outline" className="text-base">
               Try it yourself
               <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Features */}
       <section id="features" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+          >
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               Everything you need to master prompts
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               A complete toolkit for writing, analyzing, and optimizing AI prompts.
             </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          </motion.div>
+          <motion.div
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={stagger}
+          >
             {features.map((f) => (
-              <Card
-                key={f.title}
-                className="border border-border bg-card hover:shadow-md transition-shadow"
-              >
-                <CardContent className="p-6">
-                  <div className="p-2.5 bg-primary/10 rounded-lg w-fit mb-4">
-                    <f.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-foreground text-lg mb-2">{f.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {f.description}
-                  </p>
-                </CardContent>
-              </Card>
+              <motion.div key={f.title} variants={fadeUp} transition={{ duration: 0.4 }}>
+                <Card className="border border-border bg-card hover:shadow-md transition-shadow h-full">
+                  <CardContent className="p-6">
+                    <div className="p-2.5 bg-primary/10 rounded-lg w-fit mb-4">
+                      <f.icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground text-lg mb-2">{f.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {f.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Testimonials */}
       <section className="py-24 px-6 bg-muted/50">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+          >
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               Trusted by prompt engineers
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               See how teams and individuals are getting better AI results.
             </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          </motion.div>
+          <motion.div
+            className="grid md:grid-cols-3 gap-6"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={stagger}
+          >
             {testimonials.map((t) => (
-              <Card key={t.name} className="border border-border bg-card">
-                <CardContent className="p-6 flex flex-col gap-4">
-                  <p className="text-foreground text-sm leading-relaxed italic">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-3 mt-auto pt-4 border-t border-border">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
-                      {t.initials}
+              <motion.div key={t.name} variants={fadeUp} transition={{ duration: 0.4 }}>
+                <Card className="border border-border bg-card h-full">
+                  <CardContent className="p-6 flex flex-col gap-4">
+                    <p className="text-foreground text-sm leading-relaxed italic">
+                      &ldquo;{t.quote}&rdquo;
+                    </p>
+                    <div className="flex items-center gap-3 mt-auto pt-4 border-t border-border">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                        {t.initials}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{t.name}</p>
+                        <p className="text-xs text-muted-foreground">{t.role}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.role}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-6 bg-muted/50">
+      <motion.section
+        className="py-24 px-6 bg-muted/50"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        variants={fadeUp}
+        transition={{ duration: 0.6 }}
+      >
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Ready to level up your prompts?
@@ -324,7 +402,7 @@ const Landing = () => {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <footer className="border-t border-border py-8 px-6">
