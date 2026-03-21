@@ -55,6 +55,30 @@ const features = [
   },
 ];
 
+const testimonials = [
+  {
+    name: "Sarah Chen",
+    role: "AI Product Manager",
+    quote:
+      "Prompt Improver cut my prompt iteration time by 80%. The quality scoring alone is worth it — I catch vague instructions before they waste expensive API calls.",
+    initials: "SC",
+  },
+  {
+    name: "Marcus Rivera",
+    role: "Senior Developer",
+    quote:
+      "The A/B comparison feature is a game-changer. I can see three optimization strategies side-by-side and pick the best one in seconds instead of guessing.",
+    initials: "MR",
+  },
+  {
+    name: "Dr. Aisha Patel",
+    role: "Research Scientist",
+    quote:
+      "The safety analysis flagged bias issues in my research prompts that I completely missed. Essential tool for anyone doing serious AI work.",
+    initials: "AP",
+  },
+];
+
 const benefits = [
   "Save hours crafting effective prompts",
   "Get consistent, high-quality AI outputs",
