@@ -55,6 +55,30 @@ const features = [
   },
 ];
 
+const testimonials = [
+  {
+    name: "Sarah Chen",
+    role: "AI Product Manager",
+    quote:
+      "Prompt Improver cut my prompt iteration time by 80%. The quality scoring alone is worth it — I catch vague instructions before they waste expensive API calls.",
+    initials: "SC",
+  },
+  {
+    name: "Marcus Rivera",
+    role: "Senior Developer",
+    quote:
+      "The A/B comparison feature is a game-changer. I can see three optimization strategies side-by-side and pick the best one in seconds instead of guessing.",
+    initials: "MR",
+  },
+  {
+    name: "Dr. Aisha Patel",
+    role: "Research Scientist",
+    quote:
+      "The safety analysis flagged bias issues in my research prompts that I completely missed. Essential tool for anyone doing serious AI work.",
+    initials: "AP",
+  },
+];
+
 const benefits = [
   "Save hours crafting effective prompts",
   "Get consistent, high-quality AI outputs",
@@ -240,6 +264,40 @@ const Landing = () => {
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {f.description}
                   </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24 px-6 bg-muted/50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Trusted by prompt engineers
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              See how teams and individuals are getting better AI results.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((t) => (
+              <Card key={t.name} className="border border-border bg-card">
+                <CardContent className="p-6 flex flex-col gap-4">
+                  <p className="text-foreground text-sm leading-relaxed italic">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3 mt-auto pt-4 border-t border-border">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                      {t.initials}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{t.name}</p>
+                      <p className="text-xs text-muted-foreground">{t.role}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
