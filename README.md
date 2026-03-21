@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript)](https://typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-1.1.0-green?style=flat-square)](https://prompt-enhancer-grove-181.lovable.app)
+[![Version](https://img.shields.io/badge/Version-1.3.0-green?style=flat-square)](https://prompt-enhancer-grove-181.lovable.app)
 
 A powerful web application that helps you craft better AI prompts through intelligent analysis, real-time coaching, and data-driven recommendations.
 
@@ -93,6 +93,14 @@ A powerful web application that helps you craft better AI prompts through intell
 - **Backup Codes** — Two-factor recovery code support
 - **Dark/Light Mode** — System-aware theme toggle with manual override
 
+### Landing Page
+- **Feature Highlights** — Dedicated public landing page with hero, feature cards, and interactive demo
+- **Before/After Demo** — Interactive demo showcasing prompt improvement across Content Writing, Code Review, and Data Analysis
+- **Stats Bar** — Key metrics: prompts improved, active users, quality increase, models supported
+- **Testimonials** — Social proof from prompt engineers and AI professionals
+- **Smooth Animations** — Scroll-triggered entrance animations powered by Framer Motion
+- **Version Badge** — Visible version indicator in the footer
+
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
@@ -106,6 +114,7 @@ A powerful web application that helps you craft better AI prompts through intell
 | **Backend** | Lovable Cloud (Supabase) — Auth, Database, Edge Functions, Storage |
 | **AI Gateway** | Lovable AI (Gemini 2.5 Flash) |
 | **Charts** | Recharts |
+| **Animations** | Framer Motion |
 | **Icons** | Lucide React |
 | **Theming** | next-themes |
 | **Forms** | React Hook Form + Zod |
