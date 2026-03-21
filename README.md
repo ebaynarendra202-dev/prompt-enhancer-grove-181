@@ -93,6 +93,14 @@ A powerful web application that helps you craft better AI prompts through intell
 - **Backup Codes** — Two-factor recovery code support
 - **Dark/Light Mode** — System-aware theme toggle with manual override
 
+### Landing Page
+- **Feature Highlights** — Dedicated public landing page with hero, feature cards, and interactive demo
+- **Before/After Demo** — Interactive demo showcasing prompt improvement across Content Writing, Code Review, and Data Analysis
+- **Stats Bar** — Key metrics: prompts improved, active users, quality increase, models supported
+- **Testimonials** — Social proof from prompt engineers and AI professionals
+- **Smooth Animations** — Scroll-triggered entrance animations powered by Framer Motion
+- **Version Badge** — Visible version indicator in the footer
+
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
@@ -106,6 +114,7 @@ A powerful web application that helps you craft better AI prompts through intell
 | **Backend** | Lovable Cloud (Supabase) — Auth, Database, Edge Functions, Storage |
 | **AI Gateway** | Lovable AI (Gemini 2.5 Flash) |
 | **Charts** | Recharts |
+| **Animations** | Framer Motion |
 | **Icons** | Lucide React |
 | **Theming** | next-themes |
 | **Forms** | React Hook Form + Zod |
