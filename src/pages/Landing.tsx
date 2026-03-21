@@ -163,13 +163,18 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Benefits strip */}
-      <section className="border-y border-border bg-muted/50 py-8 px-6">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center gap-x-10 gap-y-4">
-          {benefits.map((b) => (
-            <div key={b} className="flex items-center gap-2 text-sm text-foreground">
-              <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
-              {b}
+      {/* Stats bar */}
+      <section className="border-y border-border bg-muted/50 py-12 px-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {[
+            { value: "50K+", label: "Prompts Improved" },
+            { value: "8,200+", label: "Active Users" },
+            { value: "+42%", label: "Avg. Quality Increase" },
+            { value: "6", label: "AI Models Supported" },
+          ].map((stat) => (
+            <div key={stat.label}>
+              <p className="text-3xl md:text-4xl font-extrabold text-primary">{stat.value}</p>
+              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
             </div>
           ))}
         </div>
