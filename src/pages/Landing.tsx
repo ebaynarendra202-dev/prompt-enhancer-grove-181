@@ -271,6 +271,40 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="py-24 px-6 bg-muted/50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Trusted by prompt engineers
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              See how teams and individuals are getting better AI results.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((t) => (
+              <Card key={t.name} className="border border-border bg-card">
+                <CardContent className="p-6 flex flex-col gap-4">
+                  <p className="text-foreground text-sm leading-relaxed italic">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3 mt-auto pt-4 border-t border-border">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                      {t.initials}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{t.name}</p>
+                      <p className="text-xs text-muted-foreground">{t.role}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-24 px-6 bg-muted/50">
         <div className="max-w-3xl mx-auto text-center">
