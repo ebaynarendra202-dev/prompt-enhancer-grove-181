@@ -332,6 +332,7 @@ const Landing = () => {
           <div className="flex items-center gap-2">
             <Wand2 className="h-4 w-4" />
             Prompt Improver
+            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">v1.2.0</span>
           </div>
           <p>© {new Date().getFullYear()} Prompt Improver. All rights reserved.</p>
         </div>
