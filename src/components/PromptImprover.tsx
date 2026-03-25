@@ -660,10 +660,14 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium uppercase">{item.model}</span>
                                   {item.category && (
-                                    <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[10px]">{item.category}</span>
+                                    <span className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">{item.category}</span>
                                   )}
                                   {item.complexity && (
-                                    <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground text-[10px]">{item.complexity}</span>
+                                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
+                                      item.complexity === 'advanced' ? 'bg-destructive/10 text-destructive' :
+                                      item.complexity === 'intermediate' ? 'bg-accent text-accent-foreground' :
+                                      'bg-secondary text-secondary-foreground'
+                                    }`}>{item.complexity}</span>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-1">
