@@ -91,6 +91,7 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
   const [history, setHistory] = useState<PromptHistory[]>([]);
   const [historyFilterCategory, setHistoryFilterCategory] = useState<string>("all");
   const [historyFilterComplexity, setHistoryFilterComplexity] = useState<string>("all");
+  const [historyFilterTag, setHistoryFilterTag] = useState<string>("all");
   const [historySearchQuery, setHistorySearchQuery] = useState<string>("");
   const { templates: customTemplates } = useCustomTemplates();
   const [templateSuggestions, setTemplateSuggestions] = useState<TemplateSuggestion[]>([]);
@@ -640,11 +641,20 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                         </Button>
                       </div>
                       </div>
+                      {historyFilterTag !== "all" && (
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <span className="text-muted-foreground">Tag:</span>
+                          <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">{historyFilterTag}</span>
+                          <Button variant="ghost" size="sm" className="h-5 px-1 text-xs text-muted-foreground" onClick={() => setHistoryFilterTag("all")}>✕</Button>
+                        </div>
+                      )}
+                      </div>
                       <ScrollArea className="h-[calc(100vh-280px)]">
                         <div className="space-y-4 pr-4">
                           {history
                             .filter(item => historyFilterCategory === "all" || item.category === historyFilterCategory)
                             .filter(item => historyFilterComplexity === "all" || item.complexity === historyFilterComplexity)
+                            .filter(item => historyFilterTag === "all" || (item.tags && item.tags.includes(historyFilterTag)))
                             .filter(item => {
                               if (!historySearchQuery.trim()) return true;
                               const q = historySearchQuery.toLowerCase();
@@ -693,7 +703,18 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                               {item.tags && item.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-1 pt-1">
                                   {item.tags.map((tag: string, idx: number) => (
-                                    <span key={idx} className="px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px]">
+                                    <span
+                                      key={idx}
+                                      className={`px-1.5 py-0.5 rounded-full text-[10px] cursor-pointer transition-colors ${
+                                        historyFilterTag === tag
+                                          ? "bg-primary text-primary-foreground"
+                                          : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                                      }`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setHistoryFilterTag(prev => prev === tag ? "all" : tag);
+                                      }}
+                                    >
                                       {tag}
                                     </span>
                                   ))}
