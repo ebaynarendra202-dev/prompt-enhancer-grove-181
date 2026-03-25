@@ -640,7 +640,6 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                           Clear All
                         </Button>
                       </div>
-                      </div>
                       {historyFilterTag !== "all" && (
                         <div className="flex items-center gap-1.5 text-xs">
                           <span className="text-muted-foreground">Tag:</span>
