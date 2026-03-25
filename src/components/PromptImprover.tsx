@@ -690,6 +690,15 @@ const PromptImprover = ({ initialPrompt = "" }: PromptImproverProps) => {
                                     {item.improvedPrompt}
                                   </p>
                                 </div>
+                              {item.tags && item.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 pt-1">
+                                  {item.tags.map((tag: string, idx: number) => (
+                                    <span key={idx} className="px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px]">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                               </div>
                             </div>
                           ))}

@@ -8,6 +8,7 @@ export interface PromptHistory {
   timestamp: number;
   category?: string;
   complexity?: string;
+  tags?: string[];
 }
 
 export interface AppSettings {
