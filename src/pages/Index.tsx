@@ -8,7 +8,7 @@ import PromptChainBuilder from "@/components/PromptChainBuilder";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wand2, BarChart3, LogOut, User, Link2, MessageSquare } from "lucide-react";
+import { Wand2, BarChart3, LogOut, User, Link2, MessageSquare, Shield } from "lucide-react";
 import { trackTemplateUsage, useAnalytics } from "@/hooks/useAnalytics";
 import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 import { useAuth } from "@/hooks/useAuth";
