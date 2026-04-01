@@ -21,6 +21,7 @@ const Index = () => {
   const improverRef = useRef<HTMLDivElement>(null);
   const { data: analytics } = useAnalytics();
   const { user, loading, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   useMilestoneNotifications(analytics);
 
