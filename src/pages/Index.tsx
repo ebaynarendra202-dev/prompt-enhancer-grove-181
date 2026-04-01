@@ -66,10 +66,12 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button variant="outline" onClick={() => navigate('/admin')} className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Admin
-            </Button>
+            {isAdmin && (
+              <Button variant="outline" onClick={() => navigate('/admin')} className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Admin
+              </Button>
+            )}
             <Button variant="outline" onClick={() => navigate('/profile')} className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Profile
