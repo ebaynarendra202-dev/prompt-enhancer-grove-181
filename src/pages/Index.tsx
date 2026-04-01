@@ -12,6 +12,7 @@ import { Wand2, BarChart3, LogOut, User, Link2, MessageSquare, Shield } from "lu
 import { trackTemplateUsage, useAnalytics } from "@/hooks/useAnalytics";
 import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
