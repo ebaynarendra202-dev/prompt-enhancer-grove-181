@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import SharedPrompt from "./pages/SharedPrompt";
 import Landing from "./pages/Landing";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/app" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/shared/:shareId" element={<SharedPrompt />} />
           </Routes>
         </BrowserRouter>

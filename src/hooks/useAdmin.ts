@@ -114,7 +114,7 @@ export const useAdmin = () => {
   const updateSetting = async (key: string, value: Record<string, unknown>) => {
     const { error } = await supabase
       .from('app_settings')
-      .upsert({ key, value, updated_by: user!.id, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+      .upsert({ key, value: value as unknown as Record<string, unknown>, updated_by: user!.id, updated_at: new Date().toISOString() } as any, { onConflict: 'key' });
     if (!error) {
       await fetchSettings();
     }
