@@ -122,8 +122,33 @@ export const useAdmin = () => {
   };
 
   const deleteSharedPrompt = async (id: string) => {
-    // Admins would need a specific policy for this - for now just remove from state
     setSharedPrompts(prev => prev.filter(p => p.id !== id));
+  };
+
+  const fetchUserRoles = async () => {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('user_id, role');
+    if (!error && data) {
+      return data as { user_id: string; role: string }[];
+    }
+    return [];
+  };
+
+  const assignRole = async (userId: string, role: 'admin' | 'moderator' | 'user') => {
+    const { error } = await supabase
+      .from('user_roles')
+      .insert({ user_id: userId, role } as any);
+    return { error };
+  };
+
+  const removeRole = async (userId: string, role: 'admin' | 'moderator' | 'user') => {
+    const { error } = await supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId)
+      .eq('role', role);
+    return { error };
   };
 
   const loadAllData = async () => {
@@ -140,6 +165,9 @@ export const useAdmin = () => {
     loadAllData,
     updateSetting,
     deleteSharedPrompt,
+    assignRole,
+    removeRole,
+    fetchUserRoles,
     fetchStats,
     fetchUsers,
     fetchSharedPrompts,
