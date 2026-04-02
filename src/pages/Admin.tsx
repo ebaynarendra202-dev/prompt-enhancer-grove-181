@@ -10,19 +10,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ArrowLeft, Users, BarChart3, Shield, Settings, Search,
-  Eye, TrendingUp, FileText, Heart, Link2, Loader2, AlertTriangle
+  Eye, TrendingUp, FileText, Heart, Link2, Loader2, AlertTriangle, Plus, X
 } from "lucide-react";
+import { toast } from "sonner";
 
 const Admin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: adminLoading, stats, users, sharedPrompts, settings, loadAllData, updateSetting } = useAdmin();
+  const { isAdmin, loading: adminLoading, stats, users, sharedPrompts, settings, loadAllData, updateSetting, assignRole, removeRole, fetchUserRoles } = useAdmin();
   const [userSearch, setUserSearch] = useState("");
   const [promptSearch, setPromptSearch] = useState("");
   const [newSettingKey, setNewSettingKey] = useState("");
   const [newSettingValue, setNewSettingValue] = useState("");
+  const [userRolesMap, setUserRolesMap] = useState<Record<string, string[]>>({});
+  const [roleToAdd, setRoleToAdd] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!authLoading && !user) {
