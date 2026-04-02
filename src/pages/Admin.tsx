@@ -37,8 +37,46 @@ const Admin = () => {
   useEffect(() => {
     if (isAdmin) {
       loadAllData();
+      loadRoles();
     }
   }, [isAdmin]);
+
+  const loadRoles = async () => {
+    const roles = await fetchUserRoles();
+    const map: Record<string, string[]> = {};
+    roles.forEach(r => {
+      if (!map[r.user_id]) map[r.user_id] = [];
+      map[r.user_id].push(r.role);
+    });
+    setUserRolesMap(map);
+  };
+
+  const handleAssignRole = async (userId: string) => {
+    const role = roleToAdd[userId];
+    if (!role) return;
+    const { error } = await assignRole(userId, role as any);
+    if (error) {
+      toast.error("Failed to assign role");
+    } else {
+      toast.success(`Role "${role}" assigned`);
+      setRoleToAdd(prev => ({ ...prev, [userId]: "" }));
+      await loadRoles();
+    }
+  };
+
+  const handleRemoveRole = async (userId: string, role: string) => {
+    if (userId === user?.id && role === 'admin') {
+      toast.error("You cannot remove your own admin role");
+      return;
+    }
+    const { error } = await removeRole(userId, role as any);
+    if (error) {
+      toast.error("Failed to remove role");
+    } else {
+      toast.success(`Role "${role}" removed`);
+      await loadRoles();
+    }
+  };
 
   if (authLoading || adminLoading) {
     return (
