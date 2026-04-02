@@ -229,20 +229,57 @@ const Admin = () => {
                   <TableRow>
                     <TableHead>Display Name</TableHead>
                     <TableHead>User ID</TableHead>
+                    <TableHead>Roles</TableHead>
+                    <TableHead>Assign Role</TableHead>
                     <TableHead>Joined</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredUsers.map(u => (
-                    <TableRow key={u.user_id}>
-                      <TableCell className="font-medium">{u.display_name || "—"}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground font-mono">{u.user_id.slice(0, 8)}...</TableCell>
-                      <TableCell className="text-sm">{new Date(u.created_at).toLocaleDateString()}</TableCell>
-                    </TableRow>
-                  ))}
+                  {filteredUsers.map(u => {
+                    const roles = userRolesMap[u.user_id] || [];
+                    const availableRoles = (['admin', 'moderator', 'user'] as const).filter(r => !roles.includes(r));
+                    return (
+                      <TableRow key={u.user_id}>
+                        <TableCell className="font-medium">{u.display_name || "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{u.user_id.slice(0, 8)}...</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {roles.length > 0 ? roles.map(role => (
+                              <Badge key={role} variant={role === 'admin' ? 'destructive' : role === 'moderator' ? 'default' : 'secondary'} className="flex items-center gap-1">
+                                {role}
+                                <button onClick={() => handleRemoveRole(u.user_id, role)} className="ml-0.5 hover:text-foreground">
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            )) : <span className="text-xs text-muted-foreground">No roles</span>}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {availableRoles.length > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Select value={roleToAdd[u.user_id] || ""} onValueChange={v => setRoleToAdd(prev => ({ ...prev, [u.user_id]: v }))}>
+                                <SelectTrigger className="h-8 w-[120px]">
+                                  <SelectValue placeholder="Role..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {availableRoles.map(r => (
+                                    <SelectItem key={r} value={r}>{r}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleAssignRole(u.user_id)} disabled={!roleToAdd[u.user_id]}>
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm">{new Date(u.created_at).toLocaleDateString()}</TableCell>
+                      </TableRow>
+                    );
+                  })}
                   {filteredUsers.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center text-muted-foreground py-8">No users found</TableCell>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">No users found</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
