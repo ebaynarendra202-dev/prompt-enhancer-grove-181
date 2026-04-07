@@ -402,6 +402,21 @@ const Admin = () => {
                     </TableBody>
                   </Table>
                 )}
+                {activityTotal > ACTIVITY_PAGE_SIZE && (
+                  <div className="flex items-center justify-between pt-4">
+                    <p className="text-sm text-muted-foreground">
+                      Showing {activityPage * ACTIVITY_PAGE_SIZE + 1}–{Math.min((activityPage + 1) * ACTIVITY_PAGE_SIZE, activityTotal)} of {activityTotal}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" disabled={activityPage === 0} onClick={() => handleActivityPageChange(activityPage - 1)}>
+                        Previous
+                      </Button>
+                      <Button variant="outline" size="sm" disabled={(activityPage + 1) * ACTIVITY_PAGE_SIZE >= activityTotal} onClick={() => handleActivityPageChange(activityPage + 1)}>
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
