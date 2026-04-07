@@ -17,14 +17,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   ArrowLeft, Users, BarChart3, Shield, Settings, Search,
-  Eye, TrendingUp, FileText, Heart, Link2, Loader2, AlertTriangle, Plus, X
+  Eye, TrendingUp, FileText, Heart, Link2, Loader2, AlertTriangle, Plus, X, ClipboardList
 } from "lucide-react";
 import { toast } from "sonner";
 
 const Admin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: adminLoading, stats, users, sharedPrompts, settings, loadAllData, updateSetting, assignRole, removeRole, fetchUserRoles } = useAdmin();
+  const { isAdmin, loading: adminLoading, stats, users, sharedPrompts, settings, activityLog, loadAllData, updateSetting, assignRole, removeRole, fetchUserRoles, logActivity } = useAdmin();
   const [userSearch, setUserSearch] = useState("");
   const [promptSearch, setPromptSearch] = useState("");
   const [newSettingKey, setNewSettingKey] = useState("");
@@ -159,7 +159,7 @@ const Admin = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" className="flex items-center gap-1.5">
               <BarChart3 className="h-4 w-4" /> Overview
             </TabsTrigger>
@@ -168,6 +168,9 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="content" className="flex items-center gap-1.5">
               <FileText className="h-4 w-4" /> Content
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="flex items-center gap-1.5">
+              <ClipboardList className="h-4 w-4" /> Activity
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-1.5">
               <Settings className="h-4 w-4" /> Settings
