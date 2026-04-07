@@ -132,6 +132,7 @@ const Admin = () => {
     try {
       const parsed = newSettingValue ? JSON.parse(newSettingValue) : {};
       await updateSetting(newSettingKey.trim(), parsed);
+      await logActivity('setting_updated', undefined, { key: newSettingKey.trim() });
       setNewSettingKey("");
       setNewSettingValue("");
     } catch {
