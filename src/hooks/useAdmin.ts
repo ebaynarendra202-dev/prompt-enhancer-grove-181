@@ -37,6 +37,15 @@ interface AppSetting {
   updated_at: string;
 }
 
+interface ActivityLogEntry {
+  id: string;
+  performed_by: string;
+  action: string;
+  target_user_id: string | null;
+  details: Record<string, unknown>;
+  created_at: string;
+}
+
 export const useAdmin = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
