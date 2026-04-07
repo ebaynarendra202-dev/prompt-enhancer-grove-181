@@ -259,7 +259,7 @@ const Admin = () => {
                             {roles.length > 0 ? roles.map(role => (
                               <Badge key={role} variant={role === 'admin' ? 'destructive' : role === 'moderator' ? 'default' : 'secondary'} className="flex items-center gap-1">
                                 {role}
-                                <button onClick={() => handleRemoveRole(u.user_id, role)} className="ml-0.5 hover:text-foreground">
+                                <button onClick={() => confirmRemoveRole(u.user_id, role)} className="ml-0.5 hover:text-foreground">
                                   <X className="h-3 w-3" />
                                 </button>
                               </Badge>
