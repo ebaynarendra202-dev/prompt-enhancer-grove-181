@@ -54,6 +54,7 @@ export const useAdmin = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [sharedPrompts, setSharedPrompts] = useState<SharedPromptEntry[]>([]);
   const [settings, setSettings] = useState<AppSetting[]>([]);
+  const [activityLog, setActivityLog] = useState<ActivityLogEntry[]>([]);
 
   useEffect(() => {
     if (!user) {
