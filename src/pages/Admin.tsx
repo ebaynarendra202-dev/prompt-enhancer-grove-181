@@ -12,6 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   ArrowLeft, Users, BarChart3, Shield, Settings, Search,
   Eye, TrendingUp, FileText, Heart, Link2, Loader2, AlertTriangle, Plus, X
 } from "lucide-react";
@@ -27,6 +31,7 @@ const Admin = () => {
   const [newSettingValue, setNewSettingValue] = useState("");
   const [userRolesMap, setUserRolesMap] = useState<Record<string, string[]>>({});
   const [roleToAdd, setRoleToAdd] = useState<Record<string, string>>({});
+  const [pendingRemoval, setPendingRemoval] = useState<{ userId: string; role: string } | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -64,11 +69,18 @@ const Admin = () => {
     }
   };
 
-  const handleRemoveRole = async (userId: string, role: string) => {
+  const confirmRemoveRole = (userId: string, role: string) => {
     if (userId === user?.id && role === 'admin') {
       toast.error("You cannot remove your own admin role");
       return;
     }
+    setPendingRemoval({ userId, role });
+  };
+
+  const handleRemoveRole = async () => {
+    if (!pendingRemoval) return;
+    const { userId, role } = pendingRemoval;
+    setPendingRemoval(null);
     const { error } = await removeRole(userId, role as any);
     if (error) {
       toast.error("Failed to remove role");
@@ -247,7 +259,7 @@ const Admin = () => {
                             {roles.length > 0 ? roles.map(role => (
                               <Badge key={role} variant={role === 'admin' ? 'destructive' : role === 'moderator' ? 'default' : 'secondary'} className="flex items-center gap-1">
                                 {role}
-                                <button onClick={() => handleRemoveRole(u.user_id, role)} className="ml-0.5 hover:text-foreground">
+                                <button onClick={() => confirmRemoveRole(u.user_id, role)} className="ml-0.5 hover:text-foreground">
                                   <X className="h-3 w-3" />
                                 </button>
                               </Badge>
@@ -374,6 +386,21 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AlertDialog open={!!pendingRemoval} onOpenChange={open => { if (!open) setPendingRemoval(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Role</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove the "{pendingRemoval?.role}" role from this user? This action can be undone by re-assigning the role.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRemoveRole}>Remove Role</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
