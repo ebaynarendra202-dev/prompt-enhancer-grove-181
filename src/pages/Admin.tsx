@@ -69,11 +69,18 @@ const Admin = () => {
     }
   };
 
-  const handleRemoveRole = async (userId: string, role: string) => {
+  const confirmRemoveRole = (userId: string, role: string) => {
     if (userId === user?.id && role === 'admin') {
       toast.error("You cannot remove your own admin role");
       return;
     }
+    setPendingRemoval({ userId, role });
+  };
+
+  const handleRemoveRole = async () => {
+    if (!pendingRemoval) return;
+    const { userId, role } = pendingRemoval;
+    setPendingRemoval(null);
     const { error } = await removeRole(userId, role as any);
     if (error) {
       toast.error("Failed to remove role");
