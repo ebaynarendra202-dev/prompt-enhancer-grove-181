@@ -46,6 +46,15 @@ const Admin = () => {
     if (isAdmin) {
       loadAllData();
       loadRoles();
+      fetchActivityLog(0, ACTIVITY_PAGE_SIZE).then(r => setActivityTotal(r.count));
+    }
+  }, [isAdmin]);
+
+  const handleActivityPageChange = async (page: number) => {
+    setActivityPage(page);
+    const r = await fetchActivityLog(page, ACTIVITY_PAGE_SIZE);
+    setActivityTotal(r.count);
+  };
     }
   }, [isAdmin]);
 
