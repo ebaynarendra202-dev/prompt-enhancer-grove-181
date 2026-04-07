@@ -37,6 +37,15 @@ interface AppSetting {
   updated_at: string;
 }
 
+interface ActivityLogEntry {
+  id: string;
+  performed_by: string;
+  action: string;
+  target_user_id: string | null;
+  details: Record<string, unknown>;
+  created_at: string;
+}
+
 export const useAdmin = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -45,6 +54,7 @@ export const useAdmin = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [sharedPrompts, setSharedPrompts] = useState<SharedPromptEntry[]>([]);
   const [settings, setSettings] = useState<AppSetting[]>([]);
+  const [activityLog, setActivityLog] = useState<ActivityLogEntry[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -135,10 +145,33 @@ export const useAdmin = () => {
     return [];
   };
 
+  const logActivity = async (action: string, targetUserId?: string, details?: Record<string, unknown>) => {
+    await supabase.from('admin_activity_log').insert({
+      performed_by: user!.id,
+      action,
+      target_user_id: targetUserId || null,
+      details: details || {},
+    } as any);
+  };
+
+  const fetchActivityLog = async () => {
+    const { data, error } = await supabase
+      .from('admin_activity_log')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (!error && data) {
+      setActivityLog(data as unknown as ActivityLogEntry[]);
+    }
+  };
+
   const assignRole = async (userId: string, role: 'admin' | 'moderator' | 'user') => {
     const { error } = await supabase
       .from('user_roles')
       .insert({ user_id: userId, role } as any);
+    if (!error) {
+      await logActivity('role_assigned', userId, { role });
+    }
     return { error };
   };
 
@@ -148,11 +181,14 @@ export const useAdmin = () => {
       .delete()
       .eq('user_id', userId)
       .eq('role', role);
+    if (!error) {
+      await logActivity('role_removed', userId, { role });
+    }
     return { error };
   };
 
   const loadAllData = async () => {
-    await Promise.all([fetchStats(), fetchUsers(), fetchSharedPrompts(), fetchSettings()]);
+    await Promise.all([fetchStats(), fetchUsers(), fetchSharedPrompts(), fetchSettings(), fetchActivityLog()]);
   };
 
   return {
@@ -162,12 +198,15 @@ export const useAdmin = () => {
     users,
     sharedPrompts,
     settings,
+    activityLog,
     loadAllData,
     updateSetting,
     deleteSharedPrompt,
     assignRole,
     removeRole,
     fetchUserRoles,
+    logActivity,
+    fetchActivityLog,
     fetchStats,
     fetchUsers,
     fetchSharedPrompts,
