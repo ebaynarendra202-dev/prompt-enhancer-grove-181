@@ -55,8 +55,6 @@ const Admin = () => {
     const r = await fetchActivityLog(page, ACTIVITY_PAGE_SIZE);
     setActivityTotal(r.count);
   };
-    }
-  }, [isAdmin]);
 
   const loadRoles = async () => {
     const roles = await fetchUserRoles();
