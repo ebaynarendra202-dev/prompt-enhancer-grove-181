@@ -24,7 +24,7 @@ import { toast } from "sonner";
 const Admin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: adminLoading, stats, users, sharedPrompts, settings, activityLog, loadAllData, updateSetting, assignRole, removeRole, fetchUserRoles, logActivity } = useAdmin();
+  const { isAdmin, loading: adminLoading, stats, users, sharedPrompts, settings, activityLog, loadAllData, updateSetting, assignRole, removeRole, fetchUserRoles, logActivity, fetchActivityLog } = useAdmin();
   const [userSearch, setUserSearch] = useState("");
   const [promptSearch, setPromptSearch] = useState("");
   const [newSettingKey, setNewSettingKey] = useState("");
