@@ -154,15 +154,18 @@ export const useAdmin = () => {
     } as any);
   };
 
-  const fetchActivityLog = async () => {
-    const { data, error } = await supabase
+  const fetchActivityLog = async (page = 0, pageSize = 20) => {
+    const from = page * pageSize;
+    const to = from + pageSize - 1;
+    const { data, error, count } = await supabase
       .from('admin_activity_log')
-      .select('*')
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
-      .limit(100);
+      .range(from, to);
     if (!error && data) {
       setActivityLog(data as unknown as ActivityLogEntry[]);
     }
+    return { count: count ?? 0 };
   };
 
   const assignRole = async (userId: string, role: 'admin' | 'moderator' | 'user') => {

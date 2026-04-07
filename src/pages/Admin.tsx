@@ -24,7 +24,7 @@ import { toast } from "sonner";
 const Admin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: adminLoading, stats, users, sharedPrompts, settings, activityLog, loadAllData, updateSetting, assignRole, removeRole, fetchUserRoles, logActivity } = useAdmin();
+  const { isAdmin, loading: adminLoading, stats, users, sharedPrompts, settings, activityLog, loadAllData, updateSetting, assignRole, removeRole, fetchUserRoles, logActivity, fetchActivityLog } = useAdmin();
   const [userSearch, setUserSearch] = useState("");
   const [promptSearch, setPromptSearch] = useState("");
   const [newSettingKey, setNewSettingKey] = useState("");
@@ -32,6 +32,9 @@ const Admin = () => {
   const [userRolesMap, setUserRolesMap] = useState<Record<string, string[]>>({});
   const [roleToAdd, setRoleToAdd] = useState<Record<string, string>>({});
   const [pendingRemoval, setPendingRemoval] = useState<{ userId: string; role: string } | null>(null);
+  const [activityPage, setActivityPage] = useState(0);
+  const [activityTotal, setActivityTotal] = useState(0);
+  const ACTIVITY_PAGE_SIZE = 20;
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -43,8 +46,15 @@ const Admin = () => {
     if (isAdmin) {
       loadAllData();
       loadRoles();
+      fetchActivityLog(0, ACTIVITY_PAGE_SIZE).then(r => setActivityTotal(r.count));
     }
   }, [isAdmin]);
+
+  const handleActivityPageChange = async (page: number) => {
+    setActivityPage(page);
+    const r = await fetchActivityLog(page, ACTIVITY_PAGE_SIZE);
+    setActivityTotal(r.count);
+  };
 
   const loadRoles = async () => {
     const roles = await fetchUserRoles();
@@ -391,6 +401,21 @@ const Admin = () => {
                       })}
                     </TableBody>
                   </Table>
+                )}
+                {activityTotal > ACTIVITY_PAGE_SIZE && (
+                  <div className="flex items-center justify-between pt-4">
+                    <p className="text-sm text-muted-foreground">
+                      Showing {activityPage * ACTIVITY_PAGE_SIZE + 1}–{Math.min((activityPage + 1) * ACTIVITY_PAGE_SIZE, activityTotal)} of {activityTotal}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" disabled={activityPage === 0} onClick={() => handleActivityPageChange(activityPage - 1)}>
+                        Previous
+                      </Button>
+                      <Button variant="outline" size="sm" disabled={(activityPage + 1) * ACTIVITY_PAGE_SIZE >= activityTotal} onClick={() => handleActivityPageChange(activityPage + 1)}>
+                        Next
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>
