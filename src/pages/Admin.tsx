@@ -345,6 +345,56 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          {/* Activity Tab */}
+          <TabsContent value="activity" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Activity Log</CardTitle>
+                <CardDescription>Recent administrative actions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {activityLog.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">No activity recorded yet.</p>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Action</TableHead>
+                        <TableHead>Performed By</TableHead>
+                        <TableHead>Target User</TableHead>
+                        <TableHead>Details</TableHead>
+                        <TableHead>Date</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {activityLog.map(entry => {
+                        const performerName = users.find(u => u.user_id === entry.performed_by)?.display_name || entry.performed_by.slice(0, 8) + "...";
+                        const targetName = entry.target_user_id ? (users.find(u => u.user_id === entry.target_user_id)?.display_name || entry.target_user_id.slice(0, 8) + "...") : "—";
+                        return (
+                          <TableRow key={entry.id}>
+                            <TableCell>
+                              <Badge variant={entry.action.includes('remove') ? 'destructive' : entry.action.includes('assign') ? 'default' : 'secondary'}>
+                                {entry.action.replace(/_/g, ' ')}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-sm">{performerName}</TableCell>
+                            <TableCell className="text-sm">{targetName}</TableCell>
+                            <TableCell className="text-xs text-muted-foreground font-mono">
+                              {Object.entries(entry.details || {}).map(([k, v]) => `${k}: ${v}`).join(', ') || "—"}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {new Date(entry.created_at).toLocaleString()}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-4">
             <Card>
