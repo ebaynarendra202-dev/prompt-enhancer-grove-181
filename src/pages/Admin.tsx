@@ -31,6 +31,7 @@ const Admin = () => {
   const [newSettingValue, setNewSettingValue] = useState("");
   const [userRolesMap, setUserRolesMap] = useState<Record<string, string[]>>({});
   const [roleToAdd, setRoleToAdd] = useState<Record<string, string>>({});
+  const [pendingRemoval, setPendingRemoval] = useState<{ userId: string; role: string } | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
