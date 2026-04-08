@@ -5,10 +5,11 @@ import TemplateLibrary from "@/components/TemplateLibrary";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import NaturalLanguageInput from "@/components/NaturalLanguageInput";
 import PromptChainBuilder from "@/components/PromptChainBuilder";
+import PromptCollections from "@/components/PromptCollections";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wand2, BarChart3, LogOut, User, Link2, MessageSquare, Shield } from "lucide-react";
+import { Wand2, BarChart3, LogOut, User, Link2, MessageSquare, Shield, FolderOpen } from "lucide-react";
 import { trackTemplateUsage, useAnalytics } from "@/hooks/useAnalytics";
 import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 import { useAuth } from "@/hooks/useAuth";
@@ -83,7 +84,7 @@ const Index = () => {
           </div>
         </div>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-5">
             <TabsTrigger value="improver" className="flex items-center gap-2">
               <Wand2 className="h-4 w-4" />
               Improver
@@ -91,6 +92,10 @@ const Index = () => {
             <TabsTrigger value="natural" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Natural Input
+            </TabsTrigger>
+            <TabsTrigger value="collections" className="flex items-center gap-2">
+              <FolderOpen className="h-4 w-4" />
+              Collections
             </TabsTrigger>
             <TabsTrigger value="chains" className="flex items-center gap-2">
               <Link2 className="h-4 w-4" />
@@ -118,6 +123,18 @@ const Index = () => {
             <div className="max-w-3xl mx-auto">
               <NaturalLanguageInput onUsePrompt={(prompt) => {
                 setSelectedPrompt(prompt);
+                setActiveTab("improver");
+                setTimeout(() => {
+                  improverRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 100);
+              }} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="collections" className="mt-8">
+            <div className="max-w-5xl mx-auto">
+              <PromptCollections onLoadPrompt={(fav) => {
+                setSelectedPrompt(fav.original_prompt);
                 setActiveTab("improver");
                 setTimeout(() => {
                   improverRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
