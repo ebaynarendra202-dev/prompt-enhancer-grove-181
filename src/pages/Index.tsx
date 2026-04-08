@@ -131,6 +131,18 @@ const Index = () => {
             </div>
           </TabsContent>
 
+          <TabsContent value="collections" className="mt-8">
+            <div className="max-w-5xl mx-auto">
+              <PromptCollections onLoadPrompt={(fav) => {
+                setSelectedPrompt(fav.original_prompt);
+                setActiveTab("improver");
+                setTimeout(() => {
+                  improverRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 100);
+              }} />
+            </div>
+          </TabsContent>
+
           <TabsContent value="chains" className="mt-8">
             <div className="max-w-3xl mx-auto">
               <PromptChainBuilder />
