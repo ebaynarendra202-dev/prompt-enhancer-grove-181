@@ -84,7 +84,7 @@ const Index = () => {
           </div>
         </div>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-5">
             <TabsTrigger value="improver" className="flex items-center gap-2">
               <Wand2 className="h-4 w-4" />
               Improver
@@ -92,6 +92,10 @@ const Index = () => {
             <TabsTrigger value="natural" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Natural Input
+            </TabsTrigger>
+            <TabsTrigger value="collections" className="flex items-center gap-2">
+              <FolderOpen className="h-4 w-4" />
+              Collections
             </TabsTrigger>
             <TabsTrigger value="chains" className="flex items-center gap-2">
               <Link2 className="h-4 w-4" />
