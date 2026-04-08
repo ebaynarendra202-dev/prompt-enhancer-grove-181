@@ -10,6 +10,7 @@ export interface Favorite {
   ai_model: string;
   title: string | null;
   created_at: string;
+  collection_id: string | null;
 }
 
 export const useFavorites = () => {
