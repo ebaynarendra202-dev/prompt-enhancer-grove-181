@@ -164,6 +164,7 @@ export type Database = {
       favorites: {
         Row: {
           ai_model: string
+          collection_id: string | null
           created_at: string
           id: string
           improved_prompt: string
@@ -173,6 +174,7 @@ export type Database = {
         }
         Insert: {
           ai_model: string
+          collection_id?: string | null
           created_at?: string
           id?: string
           improved_prompt: string
@@ -182,6 +184,7 @@ export type Database = {
         }
         Update: {
           ai_model?: string
+          collection_id?: string | null
           created_at?: string
           id?: string
           improved_prompt?: string
@@ -189,7 +192,15 @@ export type Database = {
           title?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "favorites_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_collections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -275,6 +286,42 @@ export type Database = {
           created_at?: string
           id?: string
           title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      prompt_collections: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          sort_order?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number | null
           updated_at?: string
           user_id?: string
         }
